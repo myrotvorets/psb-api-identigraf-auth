@@ -5,6 +5,7 @@ import AuthService from '../services/auth';
 import UserService from '../services/user';
 import { today, tomorrow } from '../utils';
 import { environment } from '../lib/environment';
+import User from '../models/user';
 
 type DefaultParams = Record<string, string>;
 
@@ -23,25 +24,6 @@ interface LoginResponseBody {
     };
 }
 
-function loginHandler(authService: AuthService): RequestHandler {
-    return async (
-        req: Request<DefaultParams, LoginResponseBody, LoginRequestBody>,
-        res: Response<LoginResponseBody>,
-    ): Promise<void> => {
-        const { uid, phone } = req.body;
-        const user = await authService.login(uid, phone);
-        res.json({
-            success: true,
-            user: {
-                phone: user.phone,
-                admin: user.admin,
-                whitelisted: user.whitelisted,
-                credits: user.credits,
-            },
-        });
-    };
-}
-
 interface CheckPhoneRequestBody {
     phone: string;
 }
@@ -54,6 +36,29 @@ interface CheckPhoneResponseBody {
         whitelisted: number;
         credits: number;
     } | null;
+}
+
+function sendUserDetails(res: Response<LoginResponseBody> | Response<CheckPhoneResponseBody>, user: User): void {
+    res.json({
+        success: true,
+        user: {
+            phone: user.phone,
+            admin: user.admin,
+            whitelisted: user.whitelisted,
+            credits: user.credits,
+        },
+    });
+}
+
+function loginHandler(authService: AuthService): RequestHandler {
+    return async (
+        req: Request<DefaultParams, LoginResponseBody, LoginRequestBody>,
+        res: Response<LoginResponseBody>,
+    ): Promise<void> => {
+        const { uid, phone } = req.body;
+        const user = await authService.login(uid, phone);
+        sendUserDetails(res, user);
+    };
 }
 
 async function checkPhoneHandler(
@@ -78,15 +83,7 @@ async function checkPhoneHandler(
                 },
             } as ErrorResponse);
         } else {
-            res.json({
-                success: true,
-                user: {
-                    phone: user.phone,
-                    admin: user.admin,
-                    whitelisted: user.whitelisted,
-                    credits: user.credits,
-                },
-            });
+            sendUserDetails(res, user);
         }
     } else {
         res.json({
