@@ -17,7 +17,7 @@ RUN \
     npm r --package-lock-only \
         eslint @myrotvorets/eslint-config-myrotvorets-ts @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-prettier prettier eslint-plugin-sonarjs eslint-plugin-jest \
         @types/jest jest ts-jest merge supertest @types/supertest mock-knex @types/mock-knex jest-sonar-reporter \
-        nodemon && \
+        sqlite3 nodemon && \
     npm ci --ignore-scripts && \
     rm -f .npmrc && \
     npm rebuild && \
