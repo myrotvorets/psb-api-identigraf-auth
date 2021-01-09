@@ -123,6 +123,6 @@ export default function (): Router {
 
     router.post('/session', asyncWrapper(loginHandler(service)));
     router.post('/checkphone', asyncWrapper(checkPhoneHandler));
-    router.get('/credits/:phone', asyncWrapper(getCreditsHandler(service) as RequestHandler));
+    router.get('/credits/:phone', asyncWrapper(getCreditsHandler(service)));
     return router;
 }

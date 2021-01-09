@@ -1,41 +1,10 @@
-import path from 'path';
-import knex from 'knex';
-import { Model } from 'objection';
 import { inet_pton } from 'inet_xtoy';
 import TrackService from '../../../src/services/track';
 import LogEntry, { LogEntryInterface } from '../../../src/models/logentry';
 import User, { UserInterface } from '../../../src/models/user';
-
-const db = knex({
-    client: 'sqlite3',
-    connection: {
-        filename: ':memory:',
-    },
-    useNullAsDefault: true,
-    // debug: true,
-});
-
-Model.knex(db);
-
-const fakeTime = new Date(Date.UTC(2020, 11, 30, 0, 0, 0, 0));
-
-beforeAll(() => jest.useFakeTimers('modern').setSystemTime(fakeTime));
-beforeAll(() =>
-    db.migrate.latest({
-        directory: path.join(__dirname, '..', '..', 'migrations'),
-    }),
-);
-
-afterAll(() => db.destroy());
-afterAll(() => jest.useRealTimers());
+import { db } from './setup';
 
 describe('TrackService', () => {
-    beforeEach(() =>
-        db.seed.run({
-            directory: path.join(__dirname, '..', '..', 'seeds'),
-        }),
-    );
-
     it('should not log anything if user does not exists', () => {
         const svc = new TrackService(5);
         return expect(
