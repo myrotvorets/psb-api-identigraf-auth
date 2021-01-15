@@ -1,4 +1,4 @@
-FROM myrotvorets/node-current:latest AS base
+FROM myrotvorets/node:latest AS base
 USER root
 WORKDIR /srv/service
 RUN chown nobody:nogroup /srv/service
@@ -25,7 +25,7 @@ RUN \
 COPY --chown=nobody:nobody ./src ./src
 RUN npm run build -- --declaration false
 
-FROM myrotvorets/node-current-min
+FROM myrotvorets/node-min
 USER root
 WORKDIR /srv/service
 RUN chown nobody:nobody /srv/service
