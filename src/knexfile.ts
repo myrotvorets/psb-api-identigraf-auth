@@ -13,21 +13,14 @@ interface DbEnv {
 }
 
 function getEnvironment(environment: NodeJS.Dict<string>): Readonly<DbEnv> {
-    return cleanEnv(
-        environment,
-        {
-            NODE_ENV: str({ default: 'development' }),
-            MYSQL_DATABASE: str(),
-            MYSQL_HOST: str({ default: 'localhost' }),
-            MYSQL_USER: str({ default: '' }),
-            MYSQL_PASSWORD: str({ default: '' }),
-            MYSQL_CONN_LIMIT: num({ default: 2 }),
-        },
-        {
-            strict: true,
-            dotEnvPath: null,
-        },
-    );
+    return cleanEnv(environment, {
+        NODE_ENV: str({ default: 'development' }),
+        MYSQL_DATABASE: str(),
+        MYSQL_HOST: str({ default: 'localhost' }),
+        MYSQL_USER: str({ default: '' }),
+        MYSQL_PASSWORD: str({ default: '' }),
+        MYSQL_CONN_LIMIT: num({ default: 2 }),
+    });
 }
 
 export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env): Config {

@@ -10,18 +10,11 @@ let environ: Environment | null = null;
 
 export function environment(reset = false): Environment {
     if (!environ || reset) {
-        environ = cleanEnv(
-            process.env,
-            {
-                NODE_ENV: str({ default: 'development' }),
-                PORT: port({ default: 3000 }),
-                DEFAULT_CREDITS: num({ default: 5 }),
-            },
-            {
-                strict: true,
-                dotEnvPath: null,
-            },
-        );
+        environ = cleanEnv(process.env, {
+            NODE_ENV: str({ default: 'development' }),
+            PORT: port({ default: 3000 }),
+            DEFAULT_CREDITS: num({ default: 5 }),
+        });
     }
 
     return environ;
