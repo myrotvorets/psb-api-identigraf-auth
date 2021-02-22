@@ -11,16 +11,15 @@ export async function configure(): Promise<void> {
     if (+(process.env.ENABLE_TRACING || 0)) {
         const configurator = new OpenTelemetryConfigurator({
             serviceName: 'psb-api-identigraf-auth',
-            tracer: {
-                plugins: {
-                    express: {},
-                    http: {},
-                    https: {},
-                    knex: {
-                        path: '@myrotvorets/opentelemetry-plugin-knex',
+            instrumentations: [
+                {
+                    plugins: {
+                        knex: {
+                            path: '@myrotvorets/opentelemetry-plugin-knex',
+                        },
                     },
                 },
-            },
+            ],
         });
 
         await configurator.start();
