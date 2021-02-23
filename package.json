@@ -30,7 +30,7 @@
     "express": "^4.17.1",
     "express-openapi-validator": "^4.10.11",
     "inet_xtoy": "^1.1.2",
-    "knex": "^0.21.17",
+    "knex": "^0.21.18",
     "morgan": "^1.10.0",
     "mysql2": "^2.2.5",
     "objection": "^2.2.14"
