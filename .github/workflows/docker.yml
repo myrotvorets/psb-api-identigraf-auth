@@ -5,13 +5,23 @@ on:
     - cron: '0 10 * * *'
   push:
     branches:
-      - '**'
+      - master
+    paths-ignore:
+      - '.github/**'
+      - 'test/**'
     tags:
       - '*.*.*'
   pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '.github/**'
+      - 'test/**'
+  workflow_dispatch:
 
 jobs:
   docker:
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,7 +32,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=myrotvorets/psb-api-identigraf-auth
+          DOCKER_IMAGE=myrotvorets/psb-api-dzhura
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
