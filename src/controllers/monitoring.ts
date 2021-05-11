@@ -15,14 +15,11 @@ export let healthChecker = new HealthChecker();
 export default function (db: knex): Router {
     const router = Router();
 
-    const dbCheck = new ReadinessCheck(
-        'database',
-        (): Promise<void> => {
-            const client = db.client as Client;
-            const connection = client.acquireConnection() as Promise<unknown>;
-            return connection.then((conn) => client.releaseConnection(conn) as Promise<void>);
-        },
-    );
+    const dbCheck = new ReadinessCheck('database', (): Promise<void> => {
+        const client = db.client as Client;
+        const connection = client.acquireConnection() as Promise<unknown>;
+        return connection.then((conn) => client.releaseConnection(conn) as Promise<void>);
+    });
 
     const shutdownCheck = new ShutdownCheck('SIGTERM', (): Promise<void> => Promise.resolve());
 
