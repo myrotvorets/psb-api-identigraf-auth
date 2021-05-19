@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
-import type { Config } from 'knex';
 import { cleanEnv, num, str } from 'envalid';
+import type { Config } from 'knex';
 
 interface DbEnv {
     NODE_ENV: string;
