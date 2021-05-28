@@ -148,4 +148,27 @@ describe('TrackService', () => {
                 ]),
             );
     });
+
+    it('should not log duplicate IPs', () => {
+        const svc = new TrackService(5);
+        return expect(
+            svc.trackUpload(
+                'search',
+                '+380000000002',
+                ['127.0.0.1', '127.0.0.1', '10.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            ),
+        )
+            .resolves.toEqual([9, true])
+            .then(() => expect(db.from(LogEntry.tableName).count({ count: '*' })).resolves.toEqual([{ count: 2 }]))
+            .then(() =>
+                expect(
+                    db.from<LogEntryInterface>(LogEntry.tableName).select('phone', 'ip').orderBy('id'),
+                ).resolves.toEqual([
+                    { phone: '+380000000002', ip: inet_pton('127.0.0.1') },
+                    { phone: '+380000000002', ip: inet_pton('10.0.0.1') },
+                ]),
+            );
+    });
 });
