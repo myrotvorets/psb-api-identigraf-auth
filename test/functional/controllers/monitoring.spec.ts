@@ -6,16 +6,18 @@ import { buildKnexConfig } from '../../../src/knexfile';
 import monitoringController, { healthChecker } from '../../../src/controllers/monitoring';
 
 let app: express.Express;
+let db: knex;
 
 function buildApp(): express.Express {
     const application = express();
     application.disable('x-powered-by');
-    const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+    db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
     mockKnex.mock(db);
-    afterAll(() => mockKnex.unmock(db));
     application.use('/monitoring', monitoringController(db));
     return application;
 }
+
+afterAll(() => mockKnex.unmock(db));
 
 afterEach(() => {
     process.removeAllListeners('SIGTERM');
