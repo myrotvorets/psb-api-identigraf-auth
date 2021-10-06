@@ -1,4 +1,4 @@
-import knex from 'knex';
+import type { Knex } from 'knex';
 import User, { UserInterface } from '../../src/models/user';
 
 const today = 20201230;
@@ -72,7 +72,7 @@ const seedData: UserInterface[] = [
     },
 ];
 
-export async function seed(knex: knex): Promise<void> {
+export async function seed(knex: Knex): Promise<void> {
     await knex(User.tableName).del();
     await knex(User.tableName).insert(seedData);
 }

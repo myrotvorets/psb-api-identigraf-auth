@@ -1,5 +1,5 @@
 import path from 'path';
-import knex from 'knex';
+import { knex } from 'knex';
 import { Model } from 'objection';
 
 export const db = knex({

@@ -1,5 +1,5 @@
 import express, { json } from 'express';
-import knex from 'knex';
+import { Knex, knex } from 'knex';
 import { join } from 'path';
 import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
@@ -43,7 +43,7 @@ export function setupApp(): express.Express {
 }
 
 /* istanbul ignore next */
-function setupKnex(): knex {
+function setupKnex(): Knex {
     const db = knex(buildKnexConfig());
     Model.knex(db);
     return db;
