@@ -51,7 +51,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "merge": "^2.1.1",
     "mock-knex": "^0.4.9",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.15",
     "prettier": "^2.2.1",
     "sqlite3": "^5.0.1",
     "supertest": "^6.1.3",
