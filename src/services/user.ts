@@ -15,7 +15,7 @@ export default class UserService {
         return qb;
     }
 
-    public static saveUser(user: Partial<UserInterface> | User, trx?: TransactionOrKnex): QueryBuilder<User, User> {
+    public static saveUser(user: Partial<UserInterface>, trx?: TransactionOrKnex): QueryBuilder<User, User> {
         if (user.id) {
             const { id, ...fields } = user;
             return User.fromJson({ id }).$query(trx).patchAndFetch(fields);

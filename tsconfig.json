@@ -4,19 +4,17 @@
         "module": "CommonJS",
         "noEmitOnError": true,
         "outDir": "./dist",
-        "rootDirs": ["./src", "./test"],
+        "rootDirs": ["src", "test"],
         "sourceMap": true,
         "declaration": false,
         "removeComments": false,
         "strict": true,
+        "strictNullChecks": false,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "noFallthroughCasesInSwitch": true,
         "esModuleInterop": true,
-        "resolveJsonModule": true,
-        "typeRoots": [
-            "./node_modules/@types/"
-        ]
+        "resolveJsonModule": true
     },
     "compileOnSave": true
 }
