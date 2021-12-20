@@ -1,7 +1,7 @@
 Error.stackTraceLimit = Infinity;
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-    collectCoverage: false && process.env.COLLECT_COVERAGE !== '0',
+    collectCoverage: process.env.COLLECT_COVERAGE !== '0',
     collectCoverageFrom: [
         'src/**/*.ts',
     ],
