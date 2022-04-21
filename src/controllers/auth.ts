@@ -51,6 +51,7 @@ function sendUserDetails(res: Response<LoginResponseBody> | Response<CheckPhoneR
 }
 
 function loginHandler(authService: AuthService): RequestHandler {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return async (
         req: Request<DefaultParams, LoginResponseBody, LoginRequestBody>,
         res: Response<LoginResponseBody>,
@@ -103,6 +104,7 @@ interface GetCreditsResponse {
 }
 
 function getCreditsHandler(authService: AuthService): RequestHandler<GetCreditsParams> {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return async (req: Request<GetCreditsParams>, res: Response<GetCreditsResponse>): Promise<void> => {
         const { phone } = req.params;
         const credits = await authService.getRemainingCredits(`+${phone}`);

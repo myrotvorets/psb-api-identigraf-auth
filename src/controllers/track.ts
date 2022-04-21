@@ -14,6 +14,7 @@ interface TrackRequestBody {
 }
 
 function trackHandler(trackService: TrackService): RequestHandler {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return async (req: Request<DefaultParams, unknown, TrackRequestBody>, res: Response): Promise<void> => {
         const { type, phone, ips, dt, guid } = req.body;
         const [credits, whitelisted] = await trackService.trackUpload(type, phone, ips, guid, dt);
