@@ -1,6 +1,6 @@
 {
   "name": "identigraf-auth-microservice",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "private": true,
   "description": "IDentigraF Authentication Microservice",
   "scripts": {
