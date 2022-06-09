@@ -24,7 +24,7 @@ async function buildApp(): Promise<Express> {
 
 const fakeTime = new Date(Date.UTC(2020, 11, 30, 0, 0, 0, 0));
 
-beforeAll(() => jest.useFakeTimers('modern').setSystemTime(fakeTime));
+beforeAll(() => jest.useFakeTimers().setSystemTime(fakeTime));
 beforeAll(() => buildApp().then((application) => (app = application)));
 beforeAll(() =>
     db.migrate.latest({

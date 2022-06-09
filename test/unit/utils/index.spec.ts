@@ -1,7 +1,7 @@
 import { today, tomorrow } from '../../../src/utils/index';
 const fakeTime = new Date(Date.UTC(2020, 11, 30, 0, 0, 0, 0));
 
-beforeAll(() => jest.useFakeTimers('modern').setSystemTime(fakeTime));
+beforeAll(() => jest.useFakeTimers().setSystemTime(fakeTime));
 afterAll(() => jest.useRealTimers());
 
 describe('today', () => {
