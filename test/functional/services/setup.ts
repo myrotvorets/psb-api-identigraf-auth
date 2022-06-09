@@ -14,7 +14,7 @@ Model.knex(db);
 
 const fakeTime = new Date(Date.UTC(2020, 11, 30, 0, 0, 0, 0));
 
-beforeAll(() => jest.useFakeTimers('modern').setSystemTime(fakeTime));
+beforeAll(() => jest.useFakeTimers().setSystemTime(fakeTime));
 beforeAll(() =>
     db.migrate.latest({
         directory: path.join(__dirname, '..', '..', 'migrations'),
