@@ -1,7 +1,7 @@
-import { Request, RequestHandler, Response, Router } from 'express';
-import asyncWrapper from '@myrotvorets/express-async-middleware-wrapper';
-import TrackService from '../services/track';
-import { environment } from '../lib/environment';
+import { type Request, type RequestHandler, type Response, Router } from 'express';
+import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
+import { TrackService } from '../services/track.mjs';
+import { environment } from '../lib/environment.mjs';
 
 type DefaultParams = Record<string, string>;
 
@@ -28,11 +28,11 @@ function trackHandler(trackService: TrackService): RequestHandler {
     };
 }
 
-export default function (): Router {
+export function trackController(): Router {
     const env = environment();
     const router = Router();
     const service = new TrackService(env.DEFAULT_CREDITS);
 
-    router.post('/track', asyncWrapper(trackHandler(service)));
+    router.post('/track', asyncWrapperMiddleware(trackHandler(service)));
     return router;
 }

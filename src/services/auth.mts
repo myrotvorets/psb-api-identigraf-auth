@@ -1,9 +1,9 @@
-import { Model, QueryBuilder, Transaction } from 'objection';
-import User, { UserInterface } from '../models/user';
-import UserService from './user';
-import { today } from '../utils';
+import { Model, type QueryBuilder, type Transaction } from 'objection';
+import type { User, UserInterface } from '../models/user.mjs';
+import { UserService } from './user.mjs';
+import { today } from '../utils/index.mjs';
 
-export default class AuthService {
+export class AuthService {
     public constructor(private readonly defaultCredits: number) {}
 
     public login(uid: string, phone: string): Promise<User> {

@@ -8,11 +8,11 @@ import {
 } from '@cloudnative/health-connect';
 import { addJsonContentTypeMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { Router } from 'express';
-import { Knex } from 'knex';
+import type { Knex } from 'knex';
 
 export let healthChecker = new HealthChecker();
 
-export default function (db: Knex): Router {
+export function monitoringController(db: Knex): Router {
     const router = Router();
 
     const dbCheck = new ReadinessCheck('database', (): Promise<void> => {

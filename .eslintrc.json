@@ -8,6 +8,6 @@
   ],
   "env": {
     "node": true,
-    "jest": true
+    "mocha": true
   }
 }

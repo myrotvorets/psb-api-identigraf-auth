@@ -15,9 +15,9 @@ RUN \
 FROM base AS build
 RUN \
     npm r --package-lock-only \
-        eslint @myrotvorets/eslint-config-myrotvorets-ts @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-prettier prettier eslint-plugin-sonarjs eslint-plugin-jest eslint-plugin-promise eslint-formatter-gha \
-        @types/jest jest ts-jest merge supertest @types/supertest mock-knex @types/mock-knex jest-sonar-reporter jest-github-actions-reporter \
-        sqlite3 nodemon && \
+        eslint @myrotvorets/eslint-config-myrotvorets-ts eslint-formatter-gha \
+        mocha @types/mocha chai @types/chai supertest @types/supertest mock-knex @types/mock-knex c8 mocha-multi mocha-reporter-gha mocha-reporter-sonarqube \
+        sqlite3 nodemon ts-node && \
     npm ci --ignore-scripts && \
     rm -f .npmrc && \
     npm rebuild && \

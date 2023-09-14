@@ -1,0 +1,187 @@
+import { after, before, beforeEach, describe, it } from 'mocha';
+import { expect } from 'chai';
+import { inet_pton } from 'inet_xtoy';
+import { TrackService } from '../../../src/services/track.mjs';
+import { LogEntry, type LogEntryInterface } from '../../../src/models/logentry.mjs';
+import { User, type UserInterface } from '../../../src/models/user.mjs';
+import { db, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
+
+interface CountResult {
+    count: number | string;
+}
+
+const countLogs = (): Promise<CountResult[]> => db.count({ count: '*' }).from(LogEntry.tableName);
+
+const getCredits = (phone: string): Promise<Pick<UserInterface, 'credits'>> =>
+    db.from<UserInterface>(User.tableName).select('credits').where('phone', phone).first();
+
+const getLogs = (): Promise<Pick<LogEntryInterface, 'phone' | 'ip'>[]> =>
+    db.from<LogEntryInterface>(LogEntry.tableName).select('phone', 'ip').orderBy('id');
+
+describe('TrackService', () => {
+    before(setUpSuite);
+    after(tearDownSuite);
+    beforeEach(setUp);
+
+    it('should not log anything if user does not exists', async () => {
+        const svc = new TrackService(5);
+        const result = await svc.trackUpload(
+            'search',
+            '+380001234567',
+            ['127.0.0.1'],
+            '00000000-0000-0000-0000-000000000000',
+            Date.now(),
+        );
+
+        expect(result).to.deep.equal([-Infinity, false]);
+
+        const count = await countLogs();
+        expect(count).to.deep.equal([{ count: 0 }]);
+    });
+
+    describe('whitelisted users', () => {
+        it('should return [-1, true] for whitelisted users with no credits', async () => {
+            const svc = new TrackService(5);
+            const result = await svc.trackUpload(
+                'search',
+                '+380000000005',
+                ['127.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            );
+
+            expect(result).to.deep.equal([-1, true]);
+        });
+
+        it('should decrease the number of credits for users having credits', async () => {
+            const svc = new TrackService(5);
+            const result = await svc.trackUpload(
+                'search',
+                '+380000000002',
+                ['127.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            );
+
+            expect(result).to.deep.equal([9, true]);
+        });
+    });
+
+    describe('normal users', () => {
+        it('should return the default number of credits minus one for users not seen today', async () => {
+            const credits = 5;
+            const svc = new TrackService(credits);
+            const result = await svc.trackUpload(
+                'compare',
+                '+380000000003',
+                ['127.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            );
+
+            expect(result).to.deep.equal([credits - 1, false]);
+        });
+
+        it('should decrease the number of credits by one for users seen today', async () => {
+            const svc = new TrackService(5);
+            const result = await svc.trackUpload(
+                'compare',
+                '+380000000001',
+                ['127.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            );
+
+            expect(result).to.deep.equal([3, false]);
+        });
+
+        it('should not let credits be less than 0 for users seen today', async () => {
+            const svc = new TrackService(5);
+            const phone = '+380000000004';
+            const result = await svc.trackUpload(
+                'compare',
+                phone,
+                ['127.0.0.1'],
+                '00000000-0000-0000-0000-000000000000',
+                Date.now(),
+            );
+
+            expect(result).to.deep.equal([-1, false]);
+
+            const credits = await getCredits(phone);
+            expect(credits).to.deep.equal({ credits: 0 });
+        });
+    });
+
+    it('should decrease the number of credits on successful track', async () => {
+        const svc = new TrackService(5);
+        const phone = '+380000000001';
+        const result = await svc.trackUpload(
+            'search',
+            phone,
+            ['127.0.0.1'],
+            '00000000-0000-0000-0000-000000000000',
+            Date.now(),
+        );
+
+        expect(result).to.deep.equal([3, false]);
+
+        const count = await countLogs();
+        expect(count).to.deep.equal([{ count: 1 }]);
+
+        const credits = await getCredits(phone);
+        expect(credits).to.deep.equal({ credits: 3 });
+    });
+
+    it('should log all IP addresses', async () => {
+        const svc = new TrackService(5);
+        const phone = '+380000000002';
+        const expectedIPs = ['127.0.0.1', '192.168.1.1', '10.0.0.1'];
+        const result = await svc.trackUpload(
+            'search',
+            phone,
+            expectedIPs,
+            '00000000-0000-0000-0000-000000000000',
+            Date.now(),
+        );
+
+        expect(result).to.deep.equal([9, true]);
+
+        const count = await countLogs();
+        expect(count).to.deep.equal([{ count: 3 }]);
+
+        const credits = await getCredits(phone);
+        expect(credits).to.deep.equal({ credits: 9 });
+
+        const logs = await getLogs();
+        expect(logs).to.deep.equal([
+            { phone: phone, ip: inet_pton(expectedIPs[0]) },
+            { phone: phone, ip: inet_pton(expectedIPs[1]) },
+            { phone: phone, ip: inet_pton(expectedIPs[2]) },
+        ]);
+    });
+
+    it('should not log duplicate IPs', async () => {
+        const svc = new TrackService(5);
+        const phone = '+380000000002';
+        const result = await svc.trackUpload(
+            'search',
+            phone,
+            ['127.0.0.1', '127.0.0.1', '10.0.0.1'],
+            '00000000-0000-0000-0000-000000000000',
+            Date.now(),
+        );
+
+        expect(result).to.deep.equal([9, true]);
+
+        const count = await countLogs();
+        expect(count).to.deep.equal([{ count: 2 }]);
+
+        const logs = await getLogs();
+
+        expect(logs).to.deep.equal([
+            { phone: phone, ip: inet_pton('127.0.0.1') },
+            { phone: phone, ip: inet_pton('10.0.0.1') },
+        ]);
+    });
+});

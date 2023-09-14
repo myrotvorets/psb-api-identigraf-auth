@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import User, { UserInterface } from '../../src/models/user';
+import { User, type UserInterface } from '../../src/models/user.mjs';
 
 const today = 20201230;
 
