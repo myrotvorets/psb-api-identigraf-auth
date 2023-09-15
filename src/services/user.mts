@@ -1,7 +1,7 @@
-import { QueryBuilder, TransactionOrKnex } from 'objection';
-import User, { UserInterface } from '../models/user';
+import type { QueryBuilder, TransactionOrKnex } from 'objection';
+import { User, type UserInterface } from '../models/user.mjs';
 
-export default class UserService {
+export class UserService {
     public static getUserByPhone(
         phone: string,
         trx?: TransactionOrKnex,

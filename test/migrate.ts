@@ -1,5 +1,5 @@
-import knex from 'knex';
-import { buildKnexConfig } from '../src/knexfile';
+import { knex } from 'knex';
+import { buildKnexConfig } from '../src/knexfile.mjs';
 
 (async (): Promise<void> => {
     const { NODE_ENV: env } = process.env;

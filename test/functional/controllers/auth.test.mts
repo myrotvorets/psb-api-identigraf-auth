@@ -1,8 +1,13 @@
+import { after, before, beforeEach, describe, it } from 'mocha';
 import request from 'supertest';
-import { app } from './setup';
-import { environment } from '../../../src/lib/environment';
+import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
+import { environment } from '../../../src/lib/environment.mjs';
 
 describe('AuthController', () => {
+    before(setUpSuite);
+    after(tearDownSuite);
+    beforeEach(setUp);
+
     describe('checkPhoneHandler', () => {
         describe('Error handling', () => {
             it('should fail the request without body', () => {
@@ -21,17 +26,16 @@ describe('AuthController', () => {
                     .expect(415);
             });
 
-            it.each(['', '+70001234567', 380680000000, '+3809512345678', null, undefined])(
-                'should fail bad phone numbers (%s)',
-                (phone) => {
+            ['', '+70001234567', 380680000000, '+3809512345678', null, undefined].forEach((phone) => {
+                it(`should fail bad phone numbers (${phone})`, () => {
                     return request(app)
                         .post('/checkphone')
                         .set('Content-Type', 'application/json')
                         .send({ phone })
                         .expect(400)
                         .expect(/"code":"BAD_REQUEST"/u);
-                },
-            );
+                });
+            });
         });
 
         describe('Normal operation', () => {
@@ -108,7 +112,7 @@ describe('AuthController', () => {
                     .expect(415);
             });
 
-            it.each([
+            [
                 ['', 'uid'],
                 ['+70001234567', 'uid'],
                 [380680000000, 'uid'],
@@ -121,13 +125,15 @@ describe('AuthController', () => {
                     '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0',
                 ],
                 ['+3809512345678', 'uid'],
-            ])('should fail bad phone numbers / UIDs (%s / %s)', (phone, uid) => {
-                return request(app)
-                    .post('/session')
-                    .set('Content-Type', 'application/json')
-                    .send({ phone, uid })
-                    .expect(400)
-                    .expect(/"code":"BAD_REQUEST"/u);
+            ].forEach(([phone, uid]) => {
+                it(`should fail bad phone numbers / UIDs (${phone} / ${uid})`, () => {
+                    return request(app)
+                        .post('/session')
+                        .set('Content-Type', 'application/json')
+                        .send({ phone, uid })
+                        .expect(400)
+                        .expect(/"code":"BAD_REQUEST"/u);
+                });
             });
         });
 
@@ -153,15 +159,14 @@ describe('AuthController', () => {
 
     describe('getCreditsHandler', () => {
         describe('Error handling', () => {
-            it.each(['xxx', ' ', '+', '+380681234567', '+79991234567', '79991234567'])(
-                'should fail if phone is invalid (%s)',
-                (phone) => {
+            ['xxx', ' ', '+', '+380681234567', '+79991234567', '79991234567'].forEach((phone) => {
+                it(`should fail if phone is invalid (${phone})`, () => {
                     return request(app)
                         .get(`/credits/${encodeURIComponent(phone)}`)
                         .expect(400)
                         .expect(/"code":"BAD_REQUEST"/u);
-                },
-            );
+                });
+            });
         });
 
         describe('Normal operation', () => {

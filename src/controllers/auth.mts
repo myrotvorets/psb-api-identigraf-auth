@@ -1,11 +1,11 @@
-import { NextFunction, Request, RequestHandler, Response, Router } from 'express';
-import asyncWrapper from '@myrotvorets/express-async-middleware-wrapper';
-import { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
-import AuthService from '../services/auth';
-import UserService from '../services/user';
-import { today, tomorrow } from '../utils';
-import { environment } from '../lib/environment';
-import User from '../models/user';
+import { type NextFunction, type Request, type RequestHandler, type Response, Router } from 'express';
+import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
+import type { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
+import { AuthService } from '../services/auth.mjs';
+import { UserService } from '../services/user.mjs';
+import { today, tomorrow } from '../utils/index.mjs';
+import { environment } from '../lib/environment.mjs';
+import type { User } from '../models/user.mjs';
 
 type DefaultParams = Record<string, string>;
 
@@ -115,13 +115,13 @@ function getCreditsHandler(authService: AuthService): RequestHandler<GetCreditsP
     };
 }
 
-export default function (): Router {
+export function authController(): Router {
     const env = environment();
     const router = Router();
     const service = new AuthService(env.DEFAULT_CREDITS);
 
-    router.post('/session', asyncWrapper(loginHandler(service)));
-    router.post('/checkphone', asyncWrapper(checkPhoneHandler));
-    router.get('/credits/:phone', asyncWrapper(getCreditsHandler(service)));
+    router.post('/session', asyncWrapperMiddleware(loginHandler(service)));
+    router.post('/checkphone', asyncWrapperMiddleware(checkPhoneHandler));
+    router.get('/credits/:phone', asyncWrapperMiddleware(getCreditsHandler(service)));
     return router;
 }

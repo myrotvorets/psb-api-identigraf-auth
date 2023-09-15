@@ -1,7 +1,12 @@
+import { after, before, beforeEach, describe, it } from 'mocha';
 import request from 'supertest';
-import { app } from './setup';
+import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 describe('TrackController', () => {
+    before(setUpSuite);
+    after(tearDownSuite);
+    beforeEach(setUp);
+
     describe('trackHandler', () => {
         describe('Error handling', () => {
             it('should fail the request without body', () => {
@@ -22,9 +27,8 @@ describe('TrackController', () => {
                     .expect(415);
             });
 
-            it.each(['type', 'phone', 'guid', 'ips', 'dt'])(
-                'should fail if the required field (%s) is missing',
-                (field) => {
+            ['type', 'phone', 'guid', 'ips', 'dt'].forEach((field) => {
+                it(`should fail if the required field (${field}) is missing`, () => {
                     const req: Record<string, unknown> = {
                         type: 'search',
                         phone: '+380123456789',
@@ -41,8 +45,8 @@ describe('TrackController', () => {
                         .send(req)
                         .expect(400)
                         .expect(/"code":"BAD_REQUEST"/u);
-                },
-            );
+                });
+            });
 
             it('should fail if the list of IPs is empty', () => {
                 const req: Record<string, unknown> = {
@@ -61,7 +65,7 @@ describe('TrackController', () => {
                     .expect(/"code":"BAD_REQUEST"/u);
             });
 
-            it.each([
+            [
                 ['destroy', '+380123456789', '00000000-0000-0000-0000-000000000000', '123.45.67.89', 1593640625],
                 ['search', '380123456789', '00000000-0000-0000-0000-000000000000', '123.45.67.89', 1593640625],
                 ['search', '+290123', '00000000-0000-0000-0000-000000000000', '123.45.67.89', 1593640625],
@@ -70,15 +74,17 @@ describe('TrackController', () => {
                 ['search', '+380123456789', '00000000-0000-0000-0000-000000000000', '123.45.67.890', 1593640625],
                 ['search', '+380123456789', '00000000-0000-0000-0000-000000000000', ':::1', 1593640625],
                 ['search', '+380123456789', '00000000-0000-0000-0000-000000000000', '123.45.67.89', -1593640625],
-            ])('should fail if a parameter is invalid', (type, phone, guid, ip, dt) => {
-                const req: Record<string, unknown> = { type, phone, guid, ips: [ip], dt };
+            ].forEach(([type, phone, guid, ip, dt]) => {
+                it('should fail if a parameter is invalid', () => {
+                    const req: Record<string, unknown> = { type, phone, guid, ips: [ip], dt };
 
-                return request(app)
-                    .post('/track')
-                    .set('Content-Type', 'application/json')
-                    .send(req)
-                    .expect(400)
-                    .expect(/"code":"BAD_REQUEST"/u);
+                    return request(app)
+                        .post('/track')
+                        .set('Content-Type', 'application/json')
+                        .send(req)
+                        .expect(400)
+                        .expect(/"code":"BAD_REQUEST"/u);
+                });
             });
         });
 

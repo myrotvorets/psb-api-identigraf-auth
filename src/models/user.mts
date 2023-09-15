@@ -11,7 +11,7 @@ export interface UserInterface {
     comment: string;
 }
 
-export default class User extends Model implements UserInterface {
+export class User extends Model implements UserInterface {
     public id!: number;
     public uid!: string;
     public phone!: string;

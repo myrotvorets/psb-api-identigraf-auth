@@ -1,5 +1,4 @@
-/* istanbul ignore file */
-
+/* c8 ignore start */
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
@@ -25,3 +24,4 @@ export async function down(knex: Knex): Promise<void> {
 
     await knex.schema.dropTableIfExists('sep_users');
 }
+/* c8 ignore end */

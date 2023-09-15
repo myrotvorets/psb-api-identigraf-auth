@@ -1,11 +1,11 @@
 import { inet_pton } from 'inet_xtoy';
-import { Model, TransactionOrKnex } from 'objection';
-import LogEntry, { LogEntryInterface } from '../models/logentry';
-import User, { UserInterface } from '../models/user';
-import { today } from '../utils';
-import UserService from './user';
+import { Model, type TransactionOrKnex } from 'objection';
+import { LogEntry, type LogEntryInterface } from '../models/logentry.mjs';
+import type { User, UserInterface } from '../models/user.mjs';
+import { today } from '../utils/index.mjs';
+import { UserService } from './user.mjs';
 
-export default class TrackService {
+export class TrackService {
     public constructor(private readonly defaultCredits: number) {}
 
     public async trackUpload(
@@ -31,9 +31,9 @@ export default class TrackService {
                 let promise: Promise<void>;
                 if (what === 'search') {
                     promise = TrackService.trackSearch(trx, phone, guid, uniqueIPs, dt);
-                } /* istanbul ignore else */ else if (what === 'compare') {
+                } else if (what === 'compare') {
                     promise = TrackService.trackCompare(trx, phone, guid, uniqueIPs, dt);
-                } else {
+                } /* c8 ignore next 2 */ else {
                     promise = Promise.resolve();
                 }
 

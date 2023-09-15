@@ -9,7 +9,7 @@ export interface LogEntryInterface {
     misc: string;
 }
 
-export default class LogEntry extends Model implements LogEntryInterface {
+export class LogEntry extends Model implements LogEntryInterface {
     public id!: number;
     public phone!: string;
     public guid!: Buffer;
