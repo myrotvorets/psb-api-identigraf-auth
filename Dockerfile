@@ -17,7 +17,7 @@ RUN \
     npm r --package-lock-only \
         eslint @myrotvorets/eslint-config-myrotvorets-ts eslint-formatter-gha \
         mocha @types/mocha chai @types/chai supertest @types/supertest mock-knex @types/mock-knex c8 mocha-multi mocha-reporter-gha mocha-reporter-sonarqube \
-        sqlite3 nodemon ts-node && \
+        better-sqlite3 nodemon ts-node && \
     npm ci --ignore-scripts && \
     rm -f .npmrc && \
     npm rebuild && \

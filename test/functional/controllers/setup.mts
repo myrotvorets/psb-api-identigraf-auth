@@ -13,7 +13,7 @@ export async function setUpSuite(): Promise<void> {
     mockDate();
 
     db = knexpkg({
-        client: 'sqlite3',
+        client: 'better-sqlite3',
         connection: {
             filename: ':memory:',
         },

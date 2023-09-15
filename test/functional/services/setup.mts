@@ -10,7 +10,7 @@ export function setUpSuite(): Promise<unknown> {
     mockDate();
 
     db = knexpkg({
-        client: 'sqlite3',
+        client: 'better-sqlite3',
         connection: {
             filename: ':memory:',
         },
