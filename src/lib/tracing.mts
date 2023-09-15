@@ -7,14 +7,14 @@ if (+(process.env.ENABLE_TRACING || 0)) {
     EventEmitter.defaultMaxListeners += 5;
 }
 
-export async function configure(): Promise<void> {
+export function configure(): void {
     if (+(process.env.ENABLE_TRACING || 0)) {
         const configurator = new OpenTelemetryConfigurator({
             serviceName: 'psb-api-identigraf-auth',
             instrumentations: [new KnexInstrumentation()],
         });
 
-        await configurator.start();
+        configurator.start();
     }
 }
 /* c8 ignore end */
