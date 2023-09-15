@@ -2,26 +2,30 @@
 import { after, afterEach, before, beforeEach, describe, it } from 'mocha';
 import express, { type Express } from 'express';
 import request from 'supertest';
-import knexpkg, { type Knex } from 'knex';
+import * as knexpkg from 'knex';
 import mockKnex from 'mock-knex';
 import { buildKnexConfig } from '../../../src/knexfile.mjs';
 import { healthChecker, monitoringController } from '../../../src/controllers/monitoring.mjs';
 
+// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
+const { knex } = knexpkg.default;
+
 let app: Express;
-let db: Knex;
+let db: knexpkg.Knex;
 
 describe('MonitoringController', () => {
     before(() => {
-        db = knexpkg(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+        db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
         mockKnex.mock(db);
+
+        app = express();
+        app.disable('x-powered-by');
+        app.use('/monitoring', monitoringController(db));
     });
 
     after(() => mockKnex.unmock(db));
 
     beforeEach(() => {
-        app = express();
-        app.disable('x-powered-by');
-        app.use('/monitoring', monitoringController(db));
         healthChecker.shutdownRequested = false;
     });
 

@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { type Express, json } from 'express';
-import knexpkg, { type Knex } from 'knex';
+import * as knexpkg from 'knex';
 import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { createServer } from '@myrotvorets/create-server';
@@ -14,6 +14,9 @@ import { environment } from './lib/environment.mjs';
 import { authController } from './controllers/auth.mjs';
 import { monitoringController } from './controllers/monitoring.mjs';
 import { trackController } from './controllers/track.mjs';
+
+// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
+const { knex } = knexpkg.default;
 
 export async function configureApp(app: Express): Promise<void> {
     const env = environment();
@@ -47,8 +50,8 @@ export function setupApp(): Express {
     return app;
 }
 
-function setupKnex(): Knex {
-    const db = knexpkg(buildKnexConfig());
+function setupKnex(): knexpkg.Knex {
+    const db = knex(buildKnexConfig());
     Model.knex(db);
     return db;
 }

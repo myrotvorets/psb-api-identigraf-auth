@@ -10,7 +10,7 @@ import { addJsonContentTypeMiddleware } from '@myrotvorets/express-microservice-
 import { Router } from 'express';
 import type { Knex } from 'knex';
 
-export let healthChecker = new HealthChecker();
+export const healthChecker = new HealthChecker();
 
 export function monitoringController(db: Knex): Router {
     const router = Router();
@@ -23,7 +23,6 @@ export function monitoringController(db: Knex): Router {
 
     const shutdownCheck = new ShutdownCheck('SIGTERM', (): Promise<void> => Promise.resolve());
 
-    healthChecker = new HealthChecker();
     healthChecker.registerReadinessCheck(dbCheck);
     healthChecker.registerShutdownCheck(shutdownCheck);
 

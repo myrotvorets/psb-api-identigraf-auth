@@ -1,18 +1,21 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { type Express } from 'express';
-import knexpkg, { type Knex } from 'knex';
+import * as knexpkg from 'knex';
 import { Model } from 'objection';
 import { configureApp } from '../../../src/server.mjs';
 import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
 
+// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
+const { knex } = knexpkg.default;
+
 export let app: Express;
-let db: Knex;
+let db: knexpkg.Knex;
 
 export async function setUpSuite(): Promise<void> {
     mockDate();
 
-    db = knexpkg({
+    db = knex({
         client: 'better-sqlite3',
         connection: {
             filename: ':memory:',
