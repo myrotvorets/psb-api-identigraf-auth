@@ -1,3 +1,0 @@
-test/migrations/**
-test/seeds/**
-src/knexfile.ts
