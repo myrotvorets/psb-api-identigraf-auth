@@ -5,7 +5,7 @@
   "type": "module",
   "description": "IDentigraF Authentication Microservice",
   "scripts": {
-    "prestart:dev": "[ -f /.dockerenv ] && npm run wait-for-mysql && ts-node ./test/migrate.ts",
+    "prestart:dev": "[ -f /.dockerenv ] && npm run wait-for-mysql && ts-node ./test/migrate.mts",
     "wait-for-mysql": "wait-on \"tcp:$MYSQL_HOST:3306\" -t 180000",
     "build": "tsc",
     "start:dev": "nodemon -L",
