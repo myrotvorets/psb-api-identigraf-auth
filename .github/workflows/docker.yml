@@ -19,10 +19,16 @@ on:
       - 'test/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   docker:
     if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[ci skip]') }}
     name: Build Docker image
+    permissions:
+      contents: read
+      packages: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
