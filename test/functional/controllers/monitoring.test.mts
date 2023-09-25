@@ -1,5 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
-import { after, afterEach, before, beforeEach, describe, it } from 'mocha';
+import { expect } from 'chai';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import * as knexpkg from 'knex';
@@ -7,14 +7,14 @@ import mockKnex from 'mock-knex';
 import { buildKnexConfig } from '../../../src/knexfile.mjs';
 import { healthChecker, monitoringController } from '../../../src/controllers/monitoring.mjs';
 
-// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
-const { knex } = knexpkg.default;
+describe('MonitoringController', function () {
+    let app: Express;
+    let db: knexpkg.Knex;
 
-let app: Express;
-let db: knexpkg.Knex;
+    before(function () {
+        // See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
+        const { knex } = knexpkg.default;
 
-describe('MonitoringController', () => {
-    before(() => {
         db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
         mockKnex.mock(db);
 
@@ -23,13 +23,16 @@ describe('MonitoringController', () => {
         app.use('/monitoring', monitoringController(db));
     });
 
-    after(() => mockKnex.unmock(db));
+    after(function () {
+        return mockKnex.unmock(db);
+    });
 
-    beforeEach(() => {
+    beforeEach(function () {
+        expect(healthChecker).not.to.be.undefined;
         healthChecker.shutdownRequested = false;
     });
 
-    afterEach(() => {
+    afterEach(function () {
         process.removeAllListeners('SIGTERM');
         mockKnex.getTracker().uninstall();
     });
@@ -42,18 +45,33 @@ describe('MonitoringController', () => {
         return request(app).get(`/monitoring/${endpoint}`).expect('Content-Type', /json/u).expect(503);
     };
 
-    describe('Liveness Check', () => {
-        it('should succeed', () => checker200('live'));
-        it('should fail when shutdown requested', () => checker503('live'));
+    describe('Liveness Check', function () {
+        it('should succeed', function () {
+            return checker200('live');
+        });
+
+        it('should fail when shutdown requested', function () {
+            return checker503('live');
+        });
     });
 
-    describe('Readiness Check', () => {
-        it('should succeed', () => checker200('ready'));
-        it('should fail when shutdown requested', () => checker503('ready'));
+    describe('Readiness Check', function () {
+        it('should succeed', function () {
+            return checker200('ready');
+        });
+
+        it('should fail when shutdown requested', function () {
+            return checker503('ready');
+        });
     });
 
-    describe('Health Check', () => {
-        it('should succeed', () => checker200('health'));
-        it('should fail when shutdown requested', () => checker503('health'));
+    describe('Health Check', function () {
+        it('should succeed', function () {
+            return checker200('health');
+        });
+
+        it('should fail when shutdown requested', function () {
+            return checker503('health');
+        });
     });
 });

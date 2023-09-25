@@ -12,7 +12,7 @@ const { knex } = knexpkg.default;
 export let app: Express;
 let db: knexpkg.Knex;
 
-export async function setUpSuite(): Promise<void> {
+export function setUpSuite(): Promise<unknown> {
     mockDate();
 
     db = knex({
@@ -26,12 +26,14 @@ export async function setUpSuite(): Promise<void> {
     Model.knex(db);
 
     app = express();
-    await configureApp(app);
 
-    await db.migrate.latest({
-        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
-        loadExtensions: ['.mts'],
-    });
+    return Promise.all([
+        configureApp(app),
+        db.migrate.latest({
+            directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
+            loadExtensions: ['.mts'],
+        }),
+    ]);
 }
 
 export function tearDownSuite(): Promise<unknown> {

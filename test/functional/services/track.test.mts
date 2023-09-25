@@ -1,4 +1,3 @@
-import { after, before, beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { inet_pton } from 'inet_xtoy';
 import { TrackService } from '../../../src/services/track.mjs';
@@ -18,12 +17,12 @@ const getCredits = (phone: string): Promise<Pick<UserInterface, 'credits'>> =>
 const getLogs = (): Promise<Pick<LogEntryInterface, 'phone' | 'ip'>[]> =>
     db.from<LogEntryInterface>(LogEntry.tableName).select('phone', 'ip').orderBy('id');
 
-describe('TrackService', () => {
+describe('TrackService', function () {
     before(setUpSuite);
     after(tearDownSuite);
     beforeEach(setUp);
 
-    it('should not log anything if user does not exists', async () => {
+    it('should not log anything if user does not exists', async function () {
         const svc = new TrackService(5);
         const result = await svc.trackUpload(
             'search',
@@ -39,8 +38,8 @@ describe('TrackService', () => {
         expect(count).to.deep.equal([{ count: 0 }]);
     });
 
-    describe('whitelisted users', () => {
-        it('should return [-1, true] for whitelisted users with no credits', async () => {
+    describe('whitelisted users', function () {
+        it('should return [-1, true] for whitelisted users with no credits', async function () {
             const svc = new TrackService(5);
             const result = await svc.trackUpload(
                 'search',
@@ -53,7 +52,7 @@ describe('TrackService', () => {
             expect(result).to.deep.equal([-1, true]);
         });
 
-        it('should decrease the number of credits for users having credits', async () => {
+        it('should decrease the number of credits for users having credits', async function () {
             const svc = new TrackService(5);
             const result = await svc.trackUpload(
                 'search',
@@ -67,8 +66,8 @@ describe('TrackService', () => {
         });
     });
 
-    describe('normal users', () => {
-        it('should return the default number of credits minus one for users not seen today', async () => {
+    describe('normal users', function () {
+        it('should return the default number of credits minus one for users not seen today', async function () {
             const credits = 5;
             const svc = new TrackService(credits);
             const result = await svc.trackUpload(
@@ -82,7 +81,7 @@ describe('TrackService', () => {
             expect(result).to.deep.equal([credits - 1, false]);
         });
 
-        it('should decrease the number of credits by one for users seen today', async () => {
+        it('should decrease the number of credits by one for users seen today', async function () {
             const svc = new TrackService(5);
             const result = await svc.trackUpload(
                 'compare',
@@ -95,7 +94,7 @@ describe('TrackService', () => {
             expect(result).to.deep.equal([3, false]);
         });
 
-        it('should not let credits be less than 0 for users seen today', async () => {
+        it('should not let credits be less than 0 for users seen today', async function () {
             const svc = new TrackService(5);
             const phone = '+380000000004';
             const result = await svc.trackUpload(
@@ -113,7 +112,7 @@ describe('TrackService', () => {
         });
     });
 
-    it('should decrease the number of credits on successful track', async () => {
+    it('should decrease the number of credits on successful track', async function () {
         const svc = new TrackService(5);
         const phone = '+380000000001';
         const result = await svc.trackUpload(
@@ -133,7 +132,7 @@ describe('TrackService', () => {
         expect(credits).to.deep.equal({ credits: 3 });
     });
 
-    it('should log all IP addresses', async () => {
+    it('should log all IP addresses', async function () {
         const svc = new TrackService(5);
         const phone = '+380000000002';
         const expectedIPs = ['127.0.0.1', '192.168.1.1', '10.0.0.1'];
@@ -161,7 +160,7 @@ describe('TrackService', () => {
         ]);
     });
 
-    it('should not log duplicate IPs', async () => {
+    it('should not log duplicate IPs', async function () {
         const svc = new TrackService(5);
         const phone = '+380000000002';
         const result = await svc.trackUpload(

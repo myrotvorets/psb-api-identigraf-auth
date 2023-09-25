@@ -1,18 +1,21 @@
-import { after, before, beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { AuthService } from '../../../src/services/auth.mjs';
 import { setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
-describe('AuthService', () => {
+describe('AuthService', function () {
     const credits = 5;
-    const svc = new AuthService(credits);
+    let svc: AuthService;
 
-    before(setUpSuite);
+    before(function () {
+        svc = new AuthService(credits);
+        return setUpSuite();
+    });
+
     after(tearDownSuite);
     beforeEach(setUp);
 
-    describe('login', () => {
-        it('should create a new user automatically if the phone does not exist', async () => {
+    describe('login', function () {
+        it('should create a new user automatically if the phone does not exist', async function () {
             const uid = 'new';
             const phone = '+38007654321';
             const result = await svc.login(uid, phone);
@@ -26,7 +29,7 @@ describe('AuthService', () => {
             });
         });
 
-        it('should update the existing user', async () => {
+        it('should update the existing user', async function () {
             const uid = 'new3';
             const phone = '+380000000003';
             const result = await svc.login(uid, phone);
@@ -40,8 +43,8 @@ describe('AuthService', () => {
             });
         });
 
-        describe('when the user has no credits', () => {
-            it('should renew credits for whitelisted users', async () => {
+        describe('when the user has no credits', function () {
+            it('should renew credits for whitelisted users', async function () {
                 const uid = 'new5';
                 const phone = '+380000000005';
                 const result = await svc.login(uid, phone);
@@ -55,7 +58,7 @@ describe('AuthService', () => {
                 });
             });
 
-            it('should not renew credits if a normal user without credits has already been seen today', async () => {
+            it('should not renew credits if a normal user without credits has already been seen today', async function () {
                 const uid = 'new4';
                 const phone = '+380000000004';
                 const result = await svc.login(uid, phone);
@@ -71,26 +74,26 @@ describe('AuthService', () => {
         });
     });
 
-    describe('getRemainingCredits', () => {
-        it('should return the default value if the phone does not exist', async () => {
+    describe('getRemainingCredits', function () {
+        it('should return the default value if the phone does not exist', async function () {
             const phone = '+38007654321';
             const result = await svc.getRemainingCredits(phone);
             expect(result).to.equal(credits);
         });
 
-        it('should return the number of remaining credits if the user has been seen today', async () => {
+        it('should return the number of remaining credits if the user has been seen today', async function () {
             const phone = '+380000000001';
             const result = await svc.getRemainingCredits(phone);
             expect(result).to.equal(4);
         });
 
-        it('should return the number of whitelisted credits for whitelisted users not seen today', async () => {
+        it('should return the number of whitelisted credits for whitelisted users not seen today', async function () {
             const phone = '+380000000006';
             const result = await svc.getRemainingCredits(phone);
             expect(result).to.equal(20);
         });
 
-        it('should return the default number of credits for normal users not seen today', async () => {
+        it('should return the default number of credits for normal users not seen today', async function () {
             const phone = '+380000000003';
             const result = await svc.getRemainingCredits(phone);
             expect(result).to.equal(credits);

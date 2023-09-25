@@ -1,16 +1,15 @@
-import { after, before, beforeEach, describe, it } from 'mocha';
 import request from 'supertest';
 import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 import { environment } from '../../../src/lib/environment.mjs';
 
-describe('AuthController', () => {
+describe('AuthController', function () {
     before(setUpSuite);
     after(tearDownSuite);
     beforeEach(setUp);
 
-    describe('checkPhoneHandler', () => {
-        describe('Error handling', () => {
-            it('should fail the request without body', () => {
+    describe('checkPhoneHandler', function () {
+        describe('Error handling', function () {
+            it('should fail the request without body', function () {
                 return request(app)
                     .post('/checkphone')
                     .set('Content-Type', 'application/json')
@@ -18,7 +17,7 @@ describe('AuthController', () => {
                     .expect(/"code":"BAD_REQUEST"/u);
             });
 
-            it('should fail non-JSON requests', () => {
+            it('should fail non-JSON requests', function () {
                 return request(app)
                     .post('/checkphone')
                     .set('Content-Type', 'text/plain')
@@ -26,8 +25,9 @@ describe('AuthController', () => {
                     .expect(415);
             });
 
+            // eslint-disable-next-line mocha/no-setup-in-describe
             ['', '+70001234567', 380680000000, '+3809512345678', null, undefined].forEach((phone) => {
-                it(`should fail bad phone numbers (${phone})`, () => {
+                it(`should fail bad phone numbers (${phone})`, function () {
                     return request(app)
                         .post('/checkphone')
                         .set('Content-Type', 'application/json')
@@ -38,8 +38,8 @@ describe('AuthController', () => {
             });
         });
 
-        describe('Normal operation', () => {
-            it('should return 419 for users without credits', () => {
+        describe('Normal operation', function () {
+            it('should return 419 for users without credits', function () {
                 return request(app)
                     .post('/checkphone')
                     .set('Content-Type', 'application/json')
@@ -48,7 +48,7 @@ describe('AuthController', () => {
                     .expect(/"code":"OUT_OF_CREDITS"/u);
             });
 
-            it('should return 200 for users with credits', () => {
+            it('should return 200 for users with credits', function () {
                 return request(app)
                     .post('/checkphone')
                     .set('Content-Type', 'application/json')
@@ -65,7 +65,7 @@ describe('AuthController', () => {
                     });
             });
 
-            it('should set user to null for unknown users', () => {
+            it('should set user to null for unknown users', function () {
                 return request(app)
                     .post('/checkphone')
                     .set('Content-Type', 'application/json')
@@ -76,9 +76,9 @@ describe('AuthController', () => {
         });
     });
 
-    describe('loginHandler', () => {
-        describe('Error handling', () => {
-            it('should fail the request without body', () => {
+    describe('loginHandler', function () {
+        describe('Error handling', function () {
+            it('should fail the request without body', function () {
                 return request(app)
                     .post('/session')
                     .set('Content-Type', 'application/json')
@@ -86,7 +86,7 @@ describe('AuthController', () => {
                     .expect(/"code":"BAD_REQUEST"/u);
             });
 
-            it('should fail if phone is missing', () => {
+            it('should fail if phone is missing', function () {
                 return request(app)
                     .post('/session')
                     .set('Content-Type', 'application/json')
@@ -95,7 +95,7 @@ describe('AuthController', () => {
                     .expect(/"code":"BAD_REQUEST"/u);
             });
 
-            it('should fail if uid is missing', () => {
+            it('should fail if uid is missing', function () {
                 return request(app)
                     .post('/session')
                     .set('Content-Type', 'application/json')
@@ -104,7 +104,7 @@ describe('AuthController', () => {
                     .expect(/"code":"BAD_REQUEST"/u);
             });
 
-            it('should fail non-JSON requests', () => {
+            it('should fail non-JSON requests', function () {
                 return request(app)
                     .post('/session')
                     .set('Content-Type', 'text/plain')
@@ -112,6 +112,7 @@ describe('AuthController', () => {
                     .expect(415);
             });
 
+            // eslint-disable-next-line mocha/no-setup-in-describe
             [
                 ['', 'uid'],
                 ['+70001234567', 'uid'],
@@ -126,7 +127,7 @@ describe('AuthController', () => {
                 ],
                 ['+3809512345678', 'uid'],
             ].forEach(([phone, uid]) => {
-                it(`should fail bad phone numbers / UIDs (${phone} / ${uid})`, () => {
+                it(`should fail bad phone numbers / UIDs (${phone} / ${uid})`, function () {
                     return request(app)
                         .post('/session')
                         .set('Content-Type', 'application/json')
@@ -137,8 +138,8 @@ describe('AuthController', () => {
             });
         });
 
-        describe('Normal operation', () => {
-            it('should return 200 of everything is OK', () => {
+        describe('Normal operation', function () {
+            it('should return 200 of everything is OK', function () {
                 return request(app)
                     .post('/session')
                     .set('Content-Type', 'application/json')
@@ -157,10 +158,11 @@ describe('AuthController', () => {
         });
     });
 
-    describe('getCreditsHandler', () => {
-        describe('Error handling', () => {
+    describe('getCreditsHandler', function () {
+        describe('Error handling', function () {
+            // eslint-disable-next-line mocha/no-setup-in-describe
             ['xxx', ' ', '+', '+380681234567', '+79991234567', '79991234567'].forEach((phone) => {
-                it(`should fail if phone is invalid (${phone})`, () => {
+                it(`should fail if phone is invalid (${phone})`, function () {
                     return request(app)
                         .get(`/credits/${encodeURIComponent(phone)}`)
                         .expect(400)
@@ -169,15 +171,15 @@ describe('AuthController', () => {
             });
         });
 
-        describe('Normal operation', () => {
-            it('should return 200 if everything is OK', () => {
+        describe('Normal operation', function () {
+            it('should return 200 if everything is OK', function () {
                 return request(app)
                     .get(`/credits/${encodeURIComponent('380000000001')}`)
                     .expect(200)
                     .expect({ success: true, credits: 4 });
             });
 
-            it('should return DEFAULT_CREDITS for new users', () => {
+            it('should return DEFAULT_CREDITS for new users', function () {
                 const env = environment();
                 return request(app)
                     .get(`/credits/${encodeURIComponent('380129999999')}`)

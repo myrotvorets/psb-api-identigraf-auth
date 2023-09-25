@@ -1,12 +1,18 @@
-import { afterEach, describe, it } from 'mocha';
 import { deepEqual } from 'node:assert/strict';
 import { type Environment, environment } from '../../../src/lib/environment.mjs';
 
-describe('environment', () => {
-    const env = { ...process.env };
-    afterEach(() => (process.env = { ...env }));
+describe('environment', function () {
+    let env: typeof process.env;
 
-    it('should not allow extra variables', () => {
+    before(function () {
+        env = { ...process.env };
+    });
+
+    afterEach(function () {
+        process.env = { ...env };
+    });
+
+    it('should not allow extra variables', function () {
         const expected: Environment = {
             NODE_ENV: 'development',
             PORT: 3000,
@@ -25,7 +31,7 @@ describe('environment', () => {
         deepEqual(actual, expected);
     });
 
-    it('should cache the result', () => {
+    it('should cache the result', function () {
         const expected: Environment = {
             NODE_ENV: 'staging',
             PORT: 3030,
