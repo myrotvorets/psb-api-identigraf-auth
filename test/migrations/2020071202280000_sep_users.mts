@@ -24,4 +24,4 @@ export async function down(knex: Knex): Promise<void> {
 
     await knex.schema.dropTableIfExists('sep_users');
 }
-/* c8 ignore end */
+/* c8 ignore stop */

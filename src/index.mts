@@ -4,4 +4,4 @@ import { run } from './server.mjs';
 
 configure();
 run().catch((e) => console.error(e));
-/* c8 ignore end */
+/* c8 ignore stop */
