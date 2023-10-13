@@ -32,7 +32,7 @@ const { knex } = knexpkg.default;
 
     process.stdout.write('DONE\n');
 
-    if (process.env.SEED_TABLES === 'yes') {
+    if (process.env['SEED_TABLES'] === 'yes') {
         await db.seed.run({
             directory: join(base, 'seeds'),
         });

@@ -9,7 +9,7 @@ export class TrackService {
     public constructor(private readonly defaultCredits: number) {}
 
     public async trackUpload(
-        what: 'search' | 'compare',
+        what: string,
         phone: string,
         ips: string[],
         guid: string,

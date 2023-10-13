@@ -1,6 +1,7 @@
 import type { QueryBuilder, TransactionOrKnex } from 'objection';
 import { User, type UserInterface } from '../models/user.mjs';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class UserService {
     public static getUserByPhone(
         phone: string,

@@ -1,6 +1,6 @@
 export function today(): number {
     const now = new Date();
-    return +now.toISOString().split('T')[0].replace(/-/gu, '');
+    return +now.toISOString().split('T')[0]!.replace(/-/gu, '');
 }
 
 export function tomorrow(): number {

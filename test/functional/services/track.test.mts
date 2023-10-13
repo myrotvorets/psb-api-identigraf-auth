@@ -154,9 +154,9 @@ describe('TrackService', function () {
 
         const logs = await getLogs();
         expect(logs).to.deep.equal([
-            { phone: phone, ip: inet_pton(expectedIPs[0]) },
-            { phone: phone, ip: inet_pton(expectedIPs[1]) },
-            { phone: phone, ip: inet_pton(expectedIPs[2]) },
+            { phone: phone, ip: inet_pton(expectedIPs[0]!) },
+            { phone: phone, ip: inet_pton(expectedIPs[1]!) },
+            { phone: phone, ip: inet_pton(expectedIPs[2]!) },
         ]);
     });
 

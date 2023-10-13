@@ -17,5 +17,5 @@ export class LogEntry extends Model implements LogEntryInterface {
     public dt!: number;
     public misc!: string;
 
-    public static tableName = 'sep_search_log';
+    public static override tableName = 'sep_search_log';
 }
