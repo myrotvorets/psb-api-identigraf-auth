@@ -21,5 +21,5 @@ export class User extends Model implements UserInterface {
     public lastseen!: number;
     public comment!: string;
 
-    public static tableName = 'sep_users';
+    public static override tableName = 'sep_users';
 }

@@ -37,6 +37,7 @@ describe('TrackController', function () {
                         dt: 1593640625,
                     };
 
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete req[field];
 
                     return request(app)
