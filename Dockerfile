@@ -21,8 +21,6 @@ FROM myrotvorets/node-min@sha256:925c04846fdb167c23be76c793b8322cb905fe49d39f9f3
 USER root
 WORKDIR /srv/service
 RUN chown nobody:nobody /srv/service
-COPY healthcheck.sh /usr/local/bin/
-HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 CMD ["/usr/local/bin/healthcheck.sh"]
 USER nobody:nobody
 ENTRYPOINT ["/usr/bin/node", "index.mjs"]
 COPY --chown=nobody:nobody ./src/specs ./specs
