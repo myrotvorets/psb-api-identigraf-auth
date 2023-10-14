@@ -1,48 +1,32 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import express, { type Express } from 'express';
-import * as knexpkg from 'knex';
-import { Model } from 'objection';
-import { configureApp } from '../../../src/server.mjs';
+import { type Express } from 'express';
+import { configureApp, createApp } from '../../../src/server.mjs';
+import { container } from '../../../src/lib/container.mjs';
 import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
 
-// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
-const { knex } = knexpkg.default;
-
 export let app: Express;
-let db: knexpkg.Knex;
 
-export function setUpSuite(): Promise<unknown> {
+export async function setUpSuite(): Promise<unknown> {
+    await container.dispose();
     mockDate();
 
-    db = knex({
-        client: 'better-sqlite3',
-        connection: {
-            filename: ':memory:',
-        },
-        useNullAsDefault: true,
+    app = createApp();
+    await configureApp(app);
+
+    return container.resolve('db').migrate.latest({
+        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
+        loadExtensions: ['.mts'],
     });
-
-    Model.knex(db);
-
-    app = express();
-
-    return Promise.all([
-        configureApp(app),
-        db.migrate.latest({
-            directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
-            loadExtensions: ['.mts'],
-        }),
-    ]);
 }
 
 export function tearDownSuite(): Promise<unknown> {
     unmockDate();
-    return db.destroy();
+    return container.resolve('db').destroy();
 }
 
 export function setUp(): Promise<unknown> {
-    return db.seed.run({
+    return container.resolve('db').seed.run({
         directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'seeds'),
         loadExtensions: ['.mts'],
     });

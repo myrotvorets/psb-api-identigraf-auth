@@ -2,24 +2,22 @@
 import { expect } from 'chai';
 import express, { type Express } from 'express';
 import request from 'supertest';
-import * as knexpkg from 'knex';
+import knexpkg, { type Knex } from 'knex';
 import mockKnex from 'mock-knex';
 import { buildKnexConfig } from '../../../src/knexfile.mjs';
 import { healthChecker, monitoringController } from '../../../src/controllers/monitoring.mjs';
 
 describe('MonitoringController', function () {
     let app: Express;
-    let db: knexpkg.Knex;
+    let db: Knex;
 
     before(function () {
-        // See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
-        const { knex } = knexpkg.default;
+        const { knex } = knexpkg;
 
-        db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+        db = knex(buildKnexConfig({ KNEX_DATABASE: 'fake' }));
         mockKnex.mock(db);
 
         app = express();
-        app.disable('x-powered-by');
         app.use('/monitoring', monitoringController(db));
     });
 

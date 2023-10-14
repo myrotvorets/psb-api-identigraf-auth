@@ -6,51 +6,72 @@ import type { Knex } from 'knex';
 
 interface DbEnv {
     NODE_ENV: string;
-    MYSQL_DATABASE: string;
-    MYSQL_HOST: string;
-    MYSQL_USER: string;
-    MYSQL_PASSWORD: string;
-    MYSQL_CONN_LIMIT: number;
+    KNEX_DRIVER: string;
+    KNEX_DATABASE: string;
+    KNEX_HOST: string;
+    KNEX_USER: string;
+    KNEX_PASSWORD: string;
+    KNEX_CONN_LIMIT: number;
 }
 
 function getEnvironment(environment: NodeJS.Dict<string>): Readonly<DbEnv> {
     return cleanEnv(environment, {
         NODE_ENV: str({ default: 'development' }),
-        MYSQL_DATABASE: str(),
-        MYSQL_HOST: str({ default: 'localhost' }),
-        MYSQL_USER: str({ default: '' }),
-        MYSQL_PASSWORD: str({ default: '' }),
-        MYSQL_CONN_LIMIT: num({ default: 2 }),
+        KNEX_DRIVER: str({ default: 'mysql2', choices: ['better-sqlite3', 'mysql2'] }), // Run `npm i driver` if any other driver is needed
+        KNEX_DATABASE: str(),
+        KNEX_HOST: str({ default: 'localhost' }),
+        KNEX_USER: str({ default: '' }),
+        KNEX_PASSWORD: str({ default: '' }),
+        KNEX_CONN_LIMIT: num({ default: 2 }),
     });
 }
 
 export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env): Knex.Config {
+    const base = dirname(fileURLToPath(import.meta.url));
     const env = getEnvironment(environment);
 
-    return {
-        client: 'mysql2',
-        asyncStackTraces: env.NODE_ENV === 'development',
-        connection: {
-            database: env.MYSQL_DATABASE,
-            host: env.MYSQL_HOST,
-            user: env.MYSQL_USER,
-            password: env.MYSQL_PASSWORD,
-            dateStrings: true,
-            charset: 'utf8mb4',
-        },
-        pool: {
-            min: 0,
-            max: env.MYSQL_CONN_LIMIT,
-        },
+    let config: Knex.Config = {
+        client: env.KNEX_DRIVER,
+        asyncStackTraces: ['development', 'test'].includes(env.NODE_ENV),
         migrations: {
             tableName: 'knex_migrations_identigraf_auth',
-            directory: join(dirname(fileURLToPath(import.meta.url)), '..', 'test', 'migrations'),
+            directory: join(base, '..', 'test', 'migrations'),
             loadExtensions: ['.mts'],
         },
         seeds: {
-            directory: join(dirname(fileURLToPath(import.meta.url)), '..', 'test', 'seeds'),
+            directory: join(base, '..', 'test', 'seeds'),
             loadExtensions: ['.mts'],
         },
     };
+
+    if (env.KNEX_DRIVER === 'mysql2') {
+        config = {
+            ...config,
+            connection: {
+                database: env.KNEX_DATABASE,
+                host: env.KNEX_HOST,
+                user: env.KNEX_USER,
+                password: env.KNEX_PASSWORD,
+                dateStrings: true,
+                charset: 'utf8mb4',
+            },
+            pool: {
+                min: 0,
+                max: env.KNEX_CONN_LIMIT,
+            },
+        };
+    } else if (env.KNEX_DRIVER === 'better-sqlite3') {
+        config = {
+            ...config,
+            useNullAsDefault: true,
+            connection: {
+                filename: env.KNEX_DATABASE,
+            },
+        };
+    } else {
+        throw new Error(`Unsupported driver ${env.KNEX_DRIVER}`);
+    }
+
+    return config;
 }
 /* c8 ignore stop */

@@ -1,31 +1,20 @@
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import * as knexpkg from 'knex';
+import knexpkg from 'knex';
 import { Model } from 'objection';
+import { buildKnexConfig } from '../../../src/knexfile.mjs';
 import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
 
-// See https://github.com/knex/knex/issues/5358#issuecomment-1279979120
-const { knex } = knexpkg.default;
+// eslint-disable-next-line import/no-named-as-default-member
+const { knex } = knexpkg;
 
 export let db: knexpkg.Knex;
 
-export function setUpSuite(): Promise<unknown> {
+export async function setUpSuite(): Promise<unknown> {
     mockDate();
 
-    db = knex({
-        client: 'better-sqlite3',
-        connection: {
-            filename: ':memory:',
-        },
-        useNullAsDefault: true,
-    });
-
+    db = knex(buildKnexConfig());
     Model.knex(db);
 
-    return db.migrate.latest({
-        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
-        loadExtensions: ['.mts'],
-    });
+    return db.migrate.latest();
 }
 
 export function tearDownSuite(): Promise<unknown> {
@@ -34,8 +23,5 @@ export function tearDownSuite(): Promise<unknown> {
 }
 
 export function setUp(): Promise<unknown> {
-    return db.seed.run({
-        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'seeds'),
-        loadExtensions: ['.mts'],
-    });
+    return db.seed.run();
 }
