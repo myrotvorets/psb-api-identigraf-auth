@@ -20,25 +20,31 @@ export class TrackService {
 
         console.info(`Track ${what} for ${login} (${guid})`);
         await Model.transaction(async (trx) => {
-            const user = await UserService.getUserByLogin(login, trx, true);
+            try {
+                const user = await UserService.getUserByLogin(login, trx, true);
+                console.log('User:', user);
 
-            if (user !== undefined) {
-                let data: Partial<UserInterface>;
-                [data, credits, wl] = this.adjustCredits(user);
+                if (user !== undefined) {
+                    let data: Partial<UserInterface>;
+                    [data, credits, wl] = this.adjustCredits(user);
 
-                await UserService.saveUser(data, trx);
+                    await UserService.saveUser(data, trx);
 
-                const uniqueIPs = new Set<string>(ips);
-                let promise: Promise<void>;
-                if (what === 'search') {
-                    promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
-                } else if (what === 'compare') {
-                    promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
-                } /* c8 ignore next 2 */ else {
-                    promise = Promise.resolve();
+                    const uniqueIPs = new Set<string>(ips);
+                    let promise: Promise<void>;
+                    if (what === 'search') {
+                        promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
+                    } else if (what === 'compare') {
+                        promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
+                    } /* c8 ignore next 2 */ else {
+                        promise = Promise.resolve();
+                    }
+
+                    await promise;
                 }
-
-                await promise;
+            } catch (e) {
+                console.error(e);
+                throw e;
             }
         });
 
