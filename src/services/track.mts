@@ -77,7 +77,7 @@ export class TrackService {
         ips: Iterable<string>,
         dt: number,
     ): Promise<void> {
-        container.resolve('logger').debug(`Track search for ${login} (${guid})`);
+        container.resolve('logger').info(`Track search for ${login} (${guid})`);
         for (const ip of ips) {
             const entry: Partial<LogEntryInterface> = {
                 login,

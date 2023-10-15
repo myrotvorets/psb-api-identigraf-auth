@@ -35,12 +35,12 @@ export class AuthService {
             credits = user.credits;
         }
 
-        container.resolve('logger').debug(`Credits for ${login}: (${credits})`);
+        container.resolve('logger').info(`Credits for ${login}: (${credits})`);
         return credits;
     }
 
     private createNewUser(uid: string, login: string, trx: Transaction): QueryBuilder<User, User> {
-        container.resolve('logger').debug(`Creating new user ${login} (${uid})`);
+        container.resolve('logger').info(`Creating new user ${login} (${uid})`);
         const user: Partial<UserInterface> = {
             uid,
             login,
@@ -69,7 +69,7 @@ export class AuthService {
             }
         }
 
-        container.resolve('logger').debug(`Updating user ${user.login}`);
+        container.resolve('logger').info(`Updating user ${user.login}`);
         return UserService.saveUser(user, trx);
     }
 
