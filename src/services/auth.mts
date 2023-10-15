@@ -2,12 +2,12 @@ import { Model, type QueryBuilder, type Transaction } from 'objection';
 import type { User, UserInterface } from '../models/user.mjs';
 import { UserService } from './user.mjs';
 import { today } from '../utils/index.mjs';
-import { container } from '../lib/container.mjs';
 
 export class AuthService {
     public constructor(private readonly defaultCredits: number) {}
 
     public login(uid: string, login: string): Promise<User> {
+        console.info(`Logging ing ${login} (${uid})`);
         return Model.transaction(async (trx) => {
             const user = await UserService.getUserByLogin(login, trx, true);
             if (!user) {
@@ -35,12 +35,12 @@ export class AuthService {
             credits = user.credits;
         }
 
-        container.resolve('logger').info(`Credits for ${login}: (${credits})`);
+        console.info(`Credits for ${login}: (${credits})`);
         return credits;
     }
 
     private createNewUser(uid: string, login: string, trx: Transaction): QueryBuilder<User, User> {
-        container.resolve('logger').info(`Creating new user ${login} (${uid})`);
+        console.info(`Creating new user ${login} (${uid})`);
         const user: Partial<UserInterface> = {
             uid,
             login,
@@ -69,7 +69,7 @@ export class AuthService {
             }
         }
 
-        container.resolve('logger').info(`Updating user ${user.login}`);
+        console.info(`Updating user ${user.login}`);
         return UserService.saveUser(user, trx);
     }
 

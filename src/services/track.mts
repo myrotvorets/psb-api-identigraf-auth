@@ -4,7 +4,6 @@ import { LogEntry, type LogEntryInterface } from '../models/logentry.mjs';
 import type { User, UserInterface } from '../models/user.mjs';
 import { today } from '../utils/index.mjs';
 import { UserService } from './user.mjs';
-import { container } from '../lib/container.mjs';
 
 export class TrackService {
     public constructor(private readonly defaultCredits: number) {}
@@ -19,6 +18,7 @@ export class TrackService {
         let credits = -Infinity;
         let wl = false;
 
+        console.info(`Track ${what} for ${login} (${guid})`);
         await Model.transaction(async (trx) => {
             const user = await UserService.getUserByLogin(login, trx, true);
 
@@ -77,7 +77,7 @@ export class TrackService {
         ips: Iterable<string>,
         dt: number,
     ): Promise<void> {
-        container.resolve('logger').info(`Track search for ${login} (${guid})`);
+        console.info(`Track search for ${login} (${guid})`);
         for (const ip of ips) {
             const entry: Partial<LogEntryInterface> = {
                 login,
