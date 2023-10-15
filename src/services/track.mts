@@ -18,33 +18,26 @@ export class TrackService {
         let credits = -Infinity;
         let wl = false;
 
-        console.info(`Track ${what} for ${login} (${guid})`);
         await Model.transaction(async (trx) => {
-            try {
-                const user = await UserService.getUserByLogin(login, trx, true);
-                console.log('User:', user);
+            const user = await UserService.getUserByLogin(login, trx, true);
 
-                if (user !== undefined) {
-                    let data: Partial<UserInterface>;
-                    [data, credits, wl] = this.adjustCredits(user);
+            if (user !== undefined) {
+                let data: Partial<UserInterface>;
+                [data, credits, wl] = this.adjustCredits(user);
 
-                    await UserService.saveUser(data, trx);
+                await UserService.saveUser(data, trx);
 
-                    const uniqueIPs = new Set<string>(ips);
-                    let promise: Promise<void>;
-                    if (what === 'search') {
-                        promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
-                    } else if (what === 'compare') {
-                        promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
-                    } /* c8 ignore next 2 */ else {
-                        promise = Promise.resolve();
-                    }
-
-                    await promise;
+                const uniqueIPs = new Set<string>(ips);
+                let promise: Promise<void>;
+                if (what === 'search') {
+                    promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
+                } else if (what === 'compare') {
+                    promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
+                } /* c8 ignore next 2 */ else {
+                    promise = Promise.resolve();
                 }
-            } catch (e) {
-                console.error(e);
-                throw e;
+
+                await promise;
             }
         });
 
@@ -83,7 +76,6 @@ export class TrackService {
         ips: Iterable<string>,
         dt: number,
     ): Promise<void> {
-        console.info(`Track search for ${login} (${guid})`);
         for (const ip of ips) {
             const entry: Partial<LogEntryInterface> = {
                 login,

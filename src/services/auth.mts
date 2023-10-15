@@ -7,7 +7,6 @@ export class AuthService {
     public constructor(private readonly defaultCredits: number) {}
 
     public login(uid: string, login: string): Promise<User> {
-        console.info(`Logging ing ${login} (${uid})`);
         return Model.transaction(async (trx) => {
             const user = await UserService.getUserByLogin(login, trx, true);
             if (!user) {
@@ -35,12 +34,10 @@ export class AuthService {
             credits = user.credits;
         }
 
-        console.info(`Credits for ${login}: (${credits})`);
         return credits;
     }
 
     private createNewUser(uid: string, login: string, trx: Transaction): QueryBuilder<User, User> {
-        console.info(`Creating new user ${login} (${uid})`);
         const user: Partial<UserInterface> = {
             uid,
             login,
@@ -69,7 +66,6 @@ export class AuthService {
             }
         }
 
-        console.info(`Updating user ${user.login}`);
         return UserService.saveUser(user, trx);
     }
 
