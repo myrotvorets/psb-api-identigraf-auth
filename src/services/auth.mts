@@ -2,6 +2,7 @@ import { Model, type QueryBuilder, type Transaction } from 'objection';
 import type { User, UserInterface } from '../models/user.mjs';
 import { UserService } from './user.mjs';
 import { today } from '../utils/index.mjs';
+import { container } from '../lib/container.mjs';
 
 export class AuthService {
     public constructor(private readonly defaultCredits: number) {}
@@ -27,14 +28,19 @@ export class AuthService {
         const thisDay = today();
         const lastseen = user.lastseen;
 
+        let credits: number;
         if (lastseen !== thisDay) {
-            return user.whitelisted ? user.whitelisted : this.defaultCredits;
+            credits = user.whitelisted ? user.whitelisted : this.defaultCredits;
+        } else {
+            credits = user.credits;
         }
 
-        return user.credits;
+        container.resolve('logger').debug(`Credits for ${login}: (${credits})`);
+        return credits;
     }
 
     private createNewUser(uid: string, login: string, trx: Transaction): QueryBuilder<User, User> {
+        container.resolve('logger').debug(`Creating new user ${login} (${uid})`);
         const user: Partial<UserInterface> = {
             uid,
             login,
@@ -63,6 +69,7 @@ export class AuthService {
             }
         }
 
+        container.resolve('logger').debug(`Updating user ${user.login}`);
         return UserService.saveUser(user, trx);
     }
 
