@@ -3,12 +3,12 @@ import { User, type UserInterface } from '../models/user.mjs';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class UserService {
-    public static getUserByPhone(
-        phone: string,
+    public static getUserByLogin(
+        login: string,
         trx?: TransactionOrKnex,
         forUpdate = false,
     ): QueryBuilder<User, User | undefined> {
-        let qb = User.query(trx).findOne('phone', phone);
+        let qb = User.query(trx).findOne('login', login);
         if (forUpdate) {
             qb = qb.forUpdate();
         }

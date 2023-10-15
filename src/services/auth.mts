@@ -6,11 +6,11 @@ import { today } from '../utils/index.mjs';
 export class AuthService {
     public constructor(private readonly defaultCredits: number) {}
 
-    public login(uid: string, phone: string): Promise<User> {
+    public login(uid: string, login: string): Promise<User> {
         return Model.transaction(async (trx) => {
-            const user = await UserService.getUserByPhone(phone, trx, true);
+            const user = await UserService.getUserByLogin(login, trx, true);
             if (!user) {
-                return this.createNewUser(uid, phone, trx);
+                return this.createNewUser(uid, login, trx);
             }
 
             user.uid = uid;
@@ -18,8 +18,8 @@ export class AuthService {
         });
     }
 
-    public async getRemainingCredits(phone: string): Promise<number> {
-        const user = await UserService.getUserByPhone(phone);
+    public async getRemainingCredits(login: string): Promise<number> {
+        const user = await UserService.getUserByLogin(login);
         if (!user) {
             return this.defaultCredits;
         }
@@ -34,10 +34,10 @@ export class AuthService {
         return user.credits;
     }
 
-    private createNewUser(uid: string, phone: string, trx: Transaction): QueryBuilder<User, User> {
+    private createNewUser(uid: string, login: string, trx: Transaction): QueryBuilder<User, User> {
         const user: Partial<UserInterface> = {
             uid,
-            phone,
+            login,
             admin: 0,
             whitelisted: 0,
             credits: this.defaultCredits,

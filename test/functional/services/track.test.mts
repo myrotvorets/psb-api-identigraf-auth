@@ -12,10 +12,10 @@ interface CountResult {
 const countLogs = (): Promise<CountResult[]> => db.count({ count: '*' }).from(LogEntry.tableName);
 
 const getCredits = (phone: string): Promise<Pick<UserInterface, 'credits'>> =>
-    db.from<UserInterface>(User.tableName).select('credits').where('phone', phone).first();
+    db.from<UserInterface>(User.tableName).select('credits').where('login', phone).first();
 
-const getLogs = (): Promise<Pick<LogEntryInterface, 'phone' | 'ip'>[]> =>
-    db.from<LogEntryInterface>(LogEntry.tableName).select('phone', 'ip').orderBy('id');
+const getLogs = (): Promise<Pick<LogEntryInterface, 'login' | 'ip'>[]> =>
+    db.from<LogEntryInterface>(LogEntry.tableName).select('login', 'ip').orderBy('id');
 
 describe('TrackService', function () {
     before(setUpSuite);
@@ -154,9 +154,9 @@ describe('TrackService', function () {
 
         const logs = await getLogs();
         expect(logs).to.deep.equal([
-            { phone: phone, ip: inet_pton(expectedIPs[0]!) },
-            { phone: phone, ip: inet_pton(expectedIPs[1]!) },
-            { phone: phone, ip: inet_pton(expectedIPs[2]!) },
+            { login: phone, ip: inet_pton(expectedIPs[0]!) },
+            { login: phone, ip: inet_pton(expectedIPs[1]!) },
+            { login: phone, ip: inet_pton(expectedIPs[2]!) },
         ]);
     });
 
@@ -179,8 +179,8 @@ describe('TrackService', function () {
         const logs = await getLogs();
 
         expect(logs).to.deep.equal([
-            { phone: phone, ip: inet_pton('127.0.0.1') },
-            { phone: phone, ip: inet_pton('10.0.0.1') },
+            { login: phone, ip: inet_pton('127.0.0.1') },
+            { login: phone, ip: inet_pton('10.0.0.1') },
         ]);
     });
 });

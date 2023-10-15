@@ -21,7 +21,7 @@ describe('AuthService', function () {
             const result = await svc.login(uid, phone);
             expect(result).to.be.an('object').that.includes({
                 uid,
-                phone,
+                login: phone,
                 credits,
                 admin: 0,
                 whitelisted: 0,
@@ -35,7 +35,7 @@ describe('AuthService', function () {
             const result = await svc.login(uid, phone);
             expect(result).to.be.an('object').that.includes({
                 uid,
-                phone,
+                login: phone,
                 credits,
                 admin: 0,
                 whitelisted: 0,
@@ -50,7 +50,7 @@ describe('AuthService', function () {
                 const result = await svc.login(uid, phone);
                 expect(result).to.be.an('object').that.includes({
                     uid,
-                    phone,
+                    login: phone,
                     credits: 20,
                     admin: 0,
                     whitelisted: 20,
@@ -64,7 +64,7 @@ describe('AuthService', function () {
                 const result = await svc.login(uid, phone);
                 expect(result).to.be.an('object').that.includes({
                     uid,
-                    phone,
+                    login: phone,
                     credits: 0,
                     admin: 0,
                     whitelisted: 0,

@@ -10,7 +10,7 @@ export class TrackService {
 
     public async trackUpload(
         what: string,
-        phone: string,
+        login: string,
         ips: string[],
         guid: string,
         dt: number,
@@ -19,7 +19,7 @@ export class TrackService {
         let wl = false;
 
         await Model.transaction(async (trx) => {
-            const user = await UserService.getUserByPhone(phone, trx, true);
+            const user = await UserService.getUserByLogin(login, trx, true);
 
             if (user !== undefined) {
                 let data: Partial<UserInterface>;
@@ -30,9 +30,9 @@ export class TrackService {
                 const uniqueIPs = new Set<string>(ips);
                 let promise: Promise<void>;
                 if (what === 'search') {
-                    promise = TrackService.trackSearch(trx, phone, guid, uniqueIPs, dt);
+                    promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
                 } else if (what === 'compare') {
-                    promise = TrackService.trackCompare(trx, phone, guid, uniqueIPs, dt);
+                    promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
                 } /* c8 ignore next 2 */ else {
                     promise = Promise.resolve();
                 }
@@ -71,14 +71,14 @@ export class TrackService {
 
     private static async trackSearch(
         db: TransactionOrKnex,
-        phone: string,
+        login: string,
         guid: string,
         ips: Iterable<string>,
         dt: number,
     ): Promise<void> {
         for (const ip of ips) {
             const entry: Partial<LogEntryInterface> = {
-                phone,
+                login,
                 guid: Buffer.from(guid.replace(/[^0-9a-fA-F]/gu, ''), 'hex'),
                 ip: inet_pton(ip),
                 dt,

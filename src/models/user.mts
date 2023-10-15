@@ -3,7 +3,7 @@ import { Model } from 'objection';
 export interface UserInterface {
     id: number;
     uid: string;
-    phone: string;
+    login: string;
     admin: number;
     whitelisted: number;
     credits: number;
@@ -14,7 +14,7 @@ export interface UserInterface {
 export class User extends Model implements UserInterface {
     public id!: number;
     public uid!: string;
-    public phone!: string;
+    public login!: string;
     public admin!: number;
     public whitelisted!: number;
     public credits!: number;

@@ -42,7 +42,7 @@ function sendUserDetails(res: Response<LoginResponseBody> | Response<CheckPhoneR
     res.json({
         success: true,
         user: {
-            phone: user.phone,
+            phone: user.login,
             admin: user.admin,
             whitelisted: user.whitelisted,
             credits: user.credits,
@@ -68,7 +68,7 @@ async function checkPhoneHandler(
     next: NextFunction,
 ): Promise<void> {
     const { phone } = req.body;
-    const user = await UserService.getUserByPhone(phone);
+    const user = await UserService.getUserByLogin(phone);
     if (user) {
         if (!user.whitelisted && user.lastseen === today() && user.credits <= 0) {
             const env = environment();

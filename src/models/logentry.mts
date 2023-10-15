@@ -2,7 +2,7 @@ import { Model } from 'objection';
 
 export interface LogEntryInterface {
     id: number;
-    phone: string;
+    login: string;
     guid: Buffer;
     ip: Buffer;
     dt: number;
@@ -11,7 +11,7 @@ export interface LogEntryInterface {
 
 export class LogEntry extends Model implements LogEntryInterface {
     public id!: number;
-    public phone!: string;
+    public login!: string;
     public guid!: Buffer;
     public ip!: Buffer;
     public dt!: number;

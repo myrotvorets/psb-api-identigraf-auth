@@ -8,7 +8,7 @@ const seedData: UserInterface[] = [
     {
         id: 1,
         uid: 'uid1',
-        phone: '+380000000001',
+        login: '+380000000001',
         admin: 0,
         whitelisted: 0,
         credits: 4,
@@ -19,7 +19,7 @@ const seedData: UserInterface[] = [
     {
         id: 2,
         uid: 'uid2',
-        phone: '+380000000002',
+        login: '+380000000002',
         admin: 0,
         whitelisted: 10,
         credits: 10,
@@ -30,7 +30,7 @@ const seedData: UserInterface[] = [
     {
         id: 3,
         uid: 'uid3',
-        phone: '+380000000003',
+        login: '+380000000003',
         admin: 0,
         whitelisted: 0,
         credits: 1,
@@ -41,7 +41,7 @@ const seedData: UserInterface[] = [
     {
         id: 4,
         uid: 'uid4',
-        phone: '+380000000004',
+        login: '+380000000004',
         admin: 0,
         whitelisted: 0,
         credits: 0,
@@ -52,7 +52,7 @@ const seedData: UserInterface[] = [
     {
         id: 5,
         uid: 'uid5',
-        phone: '+380000000005',
+        login: '+380000000005',
         admin: 0,
         whitelisted: 20,
         credits: 0,
@@ -63,7 +63,7 @@ const seedData: UserInterface[] = [
     {
         id: 6,
         uid: 'uid6',
-        phone: '+380000000006',
+        login: '+380000000006',
         admin: 0,
         whitelisted: 20,
         credits: 2,
