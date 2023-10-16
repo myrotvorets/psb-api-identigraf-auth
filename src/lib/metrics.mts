@@ -29,6 +29,37 @@ export function initAsyncMetrics({ db, meter }: Container): void {
         });
 
     meter
+        .createObservableUpDownCounter('identigraf.active_users', {
+            description: 'Number of active users.',
+            unit: '{count}',
+            valueType: ValueType.INT,
+        })
+        .addCallback(async (result) => {
+            const today = new Date();
+            const week = new Date();
+            const month = new Date();
+
+            week.setDate(today.getDate() - 7);
+            month.setDate(today.getDate() - 30);
+
+            const todayStr = today.toISOString().slice(0, 10).replace(/-/gu, '');
+            const weekStr = week.toISOString().slice(0, 10).replace(/-/gu, '');
+            const monthStr = month.toISOString().slice(0, 10).replace(/-/gu, '');
+
+            const row1 = await db(UserModel.tableName).count({ count: '*' }).where('lastseen', todayStr);
+            const row2 = await db(UserModel.tableName).count({ count: '*' }).where('lastseen', '>=', weekStr);
+            const row3 = await db(UserModel.tableName).count({ count: '*' }).where('lastseen', '>=', monthStr);
+
+            const usersToday = +(row1[0]?.count ?? NaN);
+            const usersWeek = +(row2[0]?.count ?? NaN);
+            const usersMonth = +(row3[0]?.count ?? NaN);
+
+            result.observe(usersToday, { period: 'today' });
+            result.observe(usersWeek, { period: 'week' });
+            result.observe(usersMonth, { period: 'month' });
+        });
+
+    meter
         .createObservableCounter('identigraf.searches', {
             description: 'Number of searches performed.',
             unit: '{count}',
