@@ -58,13 +58,13 @@ export async function run(): Promise<void> {
     const env = container.resolve('environment');
 
     const server = await createServer(app);
-    server.once('close', () => {
+    server.listen(env.PORT);
+
+    process.on('beforeExit', () => {
         container
             .resolve('db')
             .destroy()
             .catch((e) => console.error(e));
     });
-
-    server.listen(env.PORT);
 }
 /* c8 ignore stop */

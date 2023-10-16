@@ -4,6 +4,7 @@ process.env = {
     OTEL_SDK_DISABLED: 'true',
     KNEX_DRIVER: 'better-sqlite3',
     KNEX_DATABASE: ':memory:',
+    DEFAULT_CREDITS: '5',
 };
 
 /** @type {import('mocha').RootHookObject} */

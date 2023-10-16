@@ -1,6 +1,6 @@
 import type { Knex } from 'knex';
-import { LogEntry } from '../../src/models/logentry.mjs';
+import { LogEntryModel } from '../../src/models/logentry.mjs';
 
 export async function seed(knex: Knex): Promise<void> {
-    await knex(LogEntry.tableName).del();
+    await knex(LogEntryModel.tableName).del();
 }

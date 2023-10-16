@@ -1,19 +1,15 @@
 import knexpkg from 'knex';
-import { Model } from 'objection';
-import { buildKnexConfig } from '../../../src/knexfile.mjs';
 import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
-
-// eslint-disable-next-line import/no-named-as-default-member
-const { knex } = knexpkg;
+import { container, initializeContainer } from '../../../src/lib/container.mjs';
 
 export let db: knexpkg.Knex;
 
 export async function setUpSuite(): Promise<unknown> {
     mockDate();
 
-    db = knex(buildKnexConfig());
-    Model.knex(db);
-
+    await container.dispose();
+    initializeContainer();
+    db = container.resolve('db');
     return db.migrate.latest();
 }
 

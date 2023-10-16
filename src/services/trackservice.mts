@@ -1,12 +1,22 @@
 import { inet_pton } from 'inet_xtoy';
-import { Model, type TransactionOrKnex } from 'objection';
-import { LogEntry, type LogEntryInterface } from '../models/logentry.mjs';
-import type { User, UserInterface } from '../models/user.mjs';
+import type { LogEntryModel, User } from '../models/index.mjs';
+import type { ModelService } from './modelservice.mjs';
+import type { TrackServiceInterface } from './trackserviceinterface.mjs';
 import { today } from '../utils/index.mjs';
-import { UserService } from './user.mjs';
 
-export class TrackService {
-    public constructor(private readonly defaultCredits: number) {}
+interface TrackServiceOptions {
+    modelService: ModelService;
+    defaultCredits: number;
+}
+
+export class TrackService implements TrackServiceInterface {
+    private readonly defaultCredits;
+    private readonly modelService: ModelService;
+
+    public constructor({ defaultCredits, modelService }: TrackServiceOptions) {
+        this.defaultCredits = defaultCredits;
+        this.modelService = modelService;
+    }
 
     public async trackUpload(
         what: string,
@@ -18,37 +28,29 @@ export class TrackService {
         let credits = -Infinity;
         let wl = false;
 
-        await Model.transaction(async (trx) => {
-            const user = await UserService.getUserByLogin(login, trx, true);
-
+        return this.modelService.transaction(async (_trx, models) => {
+            const user = await models.user.getByLogin(login);
             if (user !== undefined) {
-                let data: Partial<UserInterface>;
+                let data: Partial<User>;
                 [data, credits, wl] = this.adjustCredits(user);
 
-                await UserService.saveUser(data, trx);
+                await models.user.save(data);
 
                 const uniqueIPs = new Set<string>(ips);
-                let promise: Promise<void>;
                 if (what === 'search') {
-                    promise = TrackService.trackSearch(trx, login, guid, uniqueIPs, dt);
-                } else if (what === 'compare') {
-                    promise = TrackService.trackCompare(trx, login, guid, uniqueIPs, dt);
-                } /* c8 ignore next 2 */ else {
-                    promise = Promise.resolve();
+                    await this.trackSearch(models.logEntry, login, guid, uniqueIPs, dt);
                 }
-
-                await promise;
             }
-        });
 
-        return [credits, wl];
+            return [credits, wl];
+        });
     }
 
-    private adjustCredits(user: User): [data: Partial<UserInterface>, credits: number, whitelisted: boolean] {
+    private adjustCredits(user: User): [data: Partial<User>, credits: number, whitelisted: boolean] {
         let credits;
         let wl = false;
         const thisDay = today();
-        const data: Partial<UserInterface> = {
+        const data: Partial<User> = {
             id: user.id,
         };
 
@@ -69,28 +71,22 @@ export class TrackService {
         return [data, credits, wl];
     }
 
-    private static async trackSearch(
-        db: TransactionOrKnex,
+    private async trackSearch(
+        logEntryModel: LogEntryModel,
         login: string,
         guid: string,
         ips: Iterable<string>,
         dt: number,
     ): Promise<void> {
         for (const ip of ips) {
-            const entry: Partial<LogEntryInterface> = {
+            // eslint-disable-next-line no-await-in-loop
+            await logEntryModel.insert({
                 login,
                 guid: Buffer.from(guid.replace(/[^0-9a-fA-F]/gu, ''), 'hex'),
                 ip: inet_pton(ip),
                 dt,
                 misc: '',
-            };
-
-            // eslint-disable-next-line no-await-in-loop
-            await LogEntry.query(db).insert(entry);
+            });
         }
-    }
-
-    private static trackCompare(..._args: unknown[]): Promise<void> {
-        return Promise.resolve();
     }
 }

@@ -1,5 +1,3 @@
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { type Express } from 'express';
 import { configureApp, createApp } from '../../../src/server.mjs';
 import { container } from '../../../src/lib/container.mjs';
@@ -14,20 +12,14 @@ export async function setUpSuite(): Promise<unknown> {
     app = createApp();
     await configureApp(app);
 
-    return container.resolve('db').migrate.latest({
-        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'migrations'),
-        loadExtensions: ['.mts'],
-    });
+    return container.resolve('db').migrate.latest();
 }
 
 export function tearDownSuite(): Promise<unknown> {
     unmockDate();
-    return container.resolve('db').destroy();
+    return container.dispose();
 }
 
 export function setUp(): Promise<unknown> {
-    return container.resolve('db').seed.run({
-        directory: join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'seeds'),
-        loadExtensions: ['.mts'],
-    });
+    return container.resolve('db').seed.run();
 }

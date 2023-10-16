@@ -2,8 +2,7 @@
 import { ValueType } from '@opentelemetry/api';
 import { getMeter } from '@myrotvorets/otel-utils';
 import type { Container } from './container.mjs';
-import { User } from '../models/user.mjs';
-import { LogEntry } from '../models/logentry.mjs';
+import { LogEntryModel, UserModel } from '../models/index.mjs';
 
 const meter = getMeter();
 
@@ -21,7 +20,7 @@ export function initAsyncMetrics({ db, meter }: Container): void {
             valueType: ValueType.INT,
         })
         .addCallback(async (result) => {
-            const row = await db(User.tableName).count({ count: '*' });
+            const row = await db(UserModel.tableName).count({ count: '*' });
             if (row[0]?.count !== undefined) {
                 result.observe(+row[0].count);
             } else {
@@ -36,7 +35,7 @@ export function initAsyncMetrics({ db, meter }: Container): void {
             valueType: ValueType.INT,
         })
         .addCallback(async (result) => {
-            const row = await db(LogEntry.tableName).count({ count: '*' });
+            const row = await db(LogEntryModel.tableName).count({ count: '*' });
             if (row[0]?.count !== undefined) {
                 result.observe(+row[0].count);
             } else {

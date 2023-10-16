@@ -1,6 +1,6 @@
-import { Model } from 'objection';
+import type { Knex } from 'knex';
 
-export interface UserInterface {
+export interface User {
     id: number;
     uid: string;
     login: string;
@@ -11,15 +11,41 @@ export interface UserInterface {
     comment: string;
 }
 
-export class User extends Model implements UserInterface {
-    public id!: number;
-    public uid!: string;
-    public login!: string;
-    public admin!: number;
-    public whitelisted!: number;
-    public credits!: number;
-    public lastseen!: number;
-    public comment!: string;
+interface ModelOptions {
+    db: Knex<User, User[]> | Knex.Transaction<User, User[]>;
+}
 
-    public static override tableName = 'sep_users';
+export class UserModel {
+    public static readonly tableName = 'sep_users';
+
+    private readonly db: ModelOptions['db'];
+
+    public constructor({ db }: ModelOptions) {
+        this.db = db;
+    }
+
+    public getByLogin(login: string): Promise<User | undefined> {
+        const builder = this.db(UserModel.tableName).where('login', login).first();
+        return this.db.isTransaction ? builder.forUpdate() : builder;
+    }
+
+    public async save(user: Partial<User>): Promise<User | undefined> {
+        const { id, ...fields } = user;
+        let userID;
+
+        if (id) {
+            await this.db(UserModel.tableName).update(fields).where('id', id);
+            userID = id;
+        } else {
+            [userID] = await this.db(UserModel.tableName).insert(fields);
+        }
+
+        return this.db(UserModel.tableName).where('id', userID).first();
+    }
+}
+
+declare module 'knex/types/tables.js' {
+    interface Tables {
+        [UserModel.tableName]: User;
+    }
 }

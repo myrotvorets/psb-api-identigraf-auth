@@ -1,6 +1,6 @@
-import { Model } from 'objection';
+import type { Knex } from 'knex';
 
-export interface LogEntryInterface {
+export interface LogEntry {
     id: number;
     login: string;
     guid: Buffer;
@@ -9,13 +9,28 @@ export interface LogEntryInterface {
     misc: string;
 }
 
-export class LogEntry extends Model implements LogEntryInterface {
-    public id!: number;
-    public login!: string;
-    public guid!: Buffer;
-    public ip!: Buffer;
-    public dt!: number;
-    public misc!: string;
+export type LogEntryForInsert = Omit<LogEntry, 'id'>;
 
-    public static override tableName = 'sep_search_log';
+interface ModelOptions {
+    db: Knex<LogEntry, LogEntry[]> | Knex.Transaction<LogEntry, LogEntry[]>;
+}
+
+export class LogEntryModel {
+    public static readonly tableName = 'sep_search_log';
+
+    private readonly db: ModelOptions['db'];
+
+    public constructor({ db }: ModelOptions) {
+        this.db = db;
+    }
+
+    public insert(entry: LogEntryForInsert): Promise<number[]> {
+        return this.db(LogEntryModel.tableName).insert(entry);
+    }
+}
+
+declare module 'knex/types/tables.js' {
+    interface Tables {
+        [LogEntryModel.tableName]: LogEntry;
+    }
 }

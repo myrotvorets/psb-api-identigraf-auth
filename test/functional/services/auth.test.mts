@@ -1,14 +1,15 @@
 import { expect } from 'chai';
-import { AuthService } from '../../../src/services/auth.mjs';
+import { container } from '../../../src/lib/container.mjs';
+import type { AuthServiceInterface } from '../../../src/services/index.mjs';
 import { setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 describe('AuthService', function () {
     const credits = 5;
-    let svc: AuthService;
+    let svc: AuthServiceInterface;
 
-    before(function () {
-        svc = new AuthService(credits);
-        return setUpSuite();
+    before(async function () {
+        await setUpSuite();
+        svc = container.resolve('authService');
     });
 
     after(tearDownSuite);

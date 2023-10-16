@@ -1,9 +1,6 @@
-import { type Request, type RequestHandler, type Response, Router } from 'express';
+import { type Request, type Response, Router } from 'express';
 import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
-import { TrackService } from '../services/track.mjs';
-import { environment } from '../lib/environment.mjs';
-
-type DefaultParams = Record<string, string>;
+import type { LocalsWithContainer } from '../lib/container.mjs';
 
 interface TrackRequestBody {
     type: 'search' | 'compare';
@@ -13,26 +10,32 @@ interface TrackRequestBody {
     guid: string;
 }
 
-function trackHandler(trackService: TrackService): RequestHandler {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    return async (req: Request<DefaultParams, unknown, TrackRequestBody>, res: Response): Promise<void> => {
-        const { type, phone, ips, dt, guid } = req.body;
-        const [credits, whitelisted] = await trackService.trackUpload(type, phone, ips, guid, dt);
-        res.json({
-            success: true,
-            response: {
-                credits: credits === -Infinity ? -1 : credits,
-                whitelisted,
-            },
-        });
+interface TrackResponseBody {
+    success: true;
+    response: {
+        credits: number;
+        whitelisted: boolean;
     };
 }
 
-export function trackController(): Router {
-    const env = environment();
-    const router = Router();
-    const service = new TrackService(env.DEFAULT_CREDITS);
+async function trackHandler(
+    req: Request<never, TrackResponseBody, TrackRequestBody>,
+    res: Response<TrackResponseBody, LocalsWithContainer>,
+): Promise<void> {
+    const { type, phone, ips, dt, guid } = req.body;
+    const trackService = res.locals.container.resolve('trackService');
+    const [credits, whitelisted] = await trackService.trackUpload(type, phone, ips, guid, dt);
+    res.json({
+        success: true,
+        response: {
+            credits: credits === -Infinity ? -1 : credits,
+            whitelisted,
+        },
+    });
+}
 
-    router.post('/track', asyncWrapperMiddleware(trackHandler(service)));
+export function trackController(): Router {
+    const router = Router();
+    router.post('/track', asyncWrapperMiddleware(trackHandler));
     return router;
 }

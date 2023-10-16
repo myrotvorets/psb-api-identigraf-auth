@@ -1,21 +1,20 @@
 import { expect } from 'chai';
 import { inet_pton } from 'inet_xtoy';
-import { TrackService } from '../../../src/services/track.mjs';
-import { LogEntry, type LogEntryInterface } from '../../../src/models/logentry.mjs';
-import { User, type UserInterface } from '../../../src/models/user.mjs';
+import { container } from '../../../src/lib/container.mjs';
+import { LogEntry, LogEntryModel, User, UserModel } from '../../../src/models/index.mjs';
 import { db, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 interface CountResult {
     count: number | string;
 }
 
-const countLogs = (): Promise<CountResult[]> => db.count({ count: '*' }).from(LogEntry.tableName);
+const countLogs = (): Promise<CountResult[]> => db.count({ count: '*' }).from(LogEntryModel.tableName);
 
-const getCredits = (phone: string): Promise<Pick<UserInterface, 'credits'>> =>
-    db.from<UserInterface>(User.tableName).select('credits').where('login', phone).first();
+const getCredits = (phone: string): Promise<Pick<User, 'credits'>> =>
+    db.from(UserModel.tableName).select('credits').where('login', phone).first();
 
-const getLogs = (): Promise<Pick<LogEntryInterface, 'login' | 'ip'>[]> =>
-    db.from<LogEntryInterface>(LogEntry.tableName).select('login', 'ip').orderBy('id');
+const getLogs = (): Promise<Pick<LogEntry, 'login' | 'ip'>[]> =>
+    db.from(LogEntryModel.tableName).select('login', 'ip').orderBy('id');
 
 describe('TrackService', function () {
     before(setUpSuite);
@@ -23,7 +22,7 @@ describe('TrackService', function () {
     beforeEach(setUp);
 
     it('should not log anything if user does not exists', async function () {
-        const svc = new TrackService(5);
+        const svc = container.resolve('trackService');
         const result = await svc.trackUpload(
             'search',
             '+380001234567',
@@ -40,7 +39,7 @@ describe('TrackService', function () {
 
     describe('whitelisted users', function () {
         it('should return [-1, true] for whitelisted users with no credits', async function () {
-            const svc = new TrackService(5);
+            const svc = container.resolve('trackService');
             const result = await svc.trackUpload(
                 'search',
                 '+380000000005',
@@ -53,7 +52,7 @@ describe('TrackService', function () {
         });
 
         it('should decrease the number of credits for users having credits', async function () {
-            const svc = new TrackService(5);
+            const svc = container.resolve('trackService');
             const result = await svc.trackUpload(
                 'search',
                 '+380000000002',
@@ -68,8 +67,8 @@ describe('TrackService', function () {
 
     describe('normal users', function () {
         it('should return the default number of credits minus one for users not seen today', async function () {
-            const credits = 5;
-            const svc = new TrackService(credits);
+            const credits = container.resolve('defaultCredits');
+            const svc = container.resolve('trackService');
             const result = await svc.trackUpload(
                 'compare',
                 '+380000000003',
@@ -82,7 +81,7 @@ describe('TrackService', function () {
         });
 
         it('should decrease the number of credits by one for users seen today', async function () {
-            const svc = new TrackService(5);
+            const svc = container.resolve('trackService');
             const result = await svc.trackUpload(
                 'compare',
                 '+380000000001',
@@ -95,7 +94,7 @@ describe('TrackService', function () {
         });
 
         it('should not let credits be less than 0 for users seen today', async function () {
-            const svc = new TrackService(5);
+            const svc = container.resolve('trackService');
             const phone = '+380000000004';
             const result = await svc.trackUpload(
                 'compare',
@@ -113,7 +112,7 @@ describe('TrackService', function () {
     });
 
     it('should decrease the number of credits on successful track', async function () {
-        const svc = new TrackService(5);
+        const svc = container.resolve('trackService');
         const phone = '+380000000001';
         const result = await svc.trackUpload(
             'search',
@@ -133,7 +132,7 @@ describe('TrackService', function () {
     });
 
     it('should log all IP addresses', async function () {
-        const svc = new TrackService(5);
+        const svc = container.resolve('trackService');
         const phone = '+380000000002';
         const expectedIPs = ['127.0.0.1', '192.168.1.1', '10.0.0.1'];
         const result = await svc.trackUpload(
@@ -161,7 +160,7 @@ describe('TrackService', function () {
     });
 
     it('should not log duplicate IPs', async function () {
-        const svc = new TrackService(5);
+        const svc = container.resolve('trackService');
         const phone = '+380000000002';
         const result = await svc.trackUpload(
             'search',
