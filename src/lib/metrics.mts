@@ -21,11 +21,7 @@ export function initAsyncMetrics({ db, meter }: Container): void {
         })
         .addCallback(async (result) => {
             const row = await db(UserModel.tableName).count({ count: '*' });
-            if (row[0]?.count !== undefined) {
-                result.observe(+row[0].count);
-            } else {
-                result.observe(NaN);
-            }
+            result.observe(+(row[0]?.count ?? NaN));
         });
 
     meter
@@ -36,8 +32,8 @@ export function initAsyncMetrics({ db, meter }: Container): void {
         })
         .addCallback(async (result) => {
             const today = new Date();
-            const week = new Date();
-            const month = new Date();
+            const week = today;
+            const month = today;
 
             week.setDate(today.getDate() - 7);
             month.setDate(today.getDate() - 30);
@@ -72,6 +68,38 @@ export function initAsyncMetrics({ db, meter }: Container): void {
             } else {
                 result.observe(NaN);
             }
+        });
+
+    meter
+        .createObservableUpDownCounter('identigraf.searches.breakdown', {
+            description: 'Number of searches performed (breakdown).',
+            unit: '{count}',
+            valueType: ValueType.INT,
+        })
+        .addCallback(async (result) => {
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+            const week = today;
+            const month = today;
+
+            week.setDate(today.getDate() - 7);
+            month.setDate(today.getDate() - 30);
+
+            const todayTimestamp = today.getTime() / 1000;
+            const weekTimestamp = week.getTime() / 1000;
+            const monthTimestamp = month.getTime() / 1000;
+
+            const row1 = await db(LogEntryModel.tableName).count({ count: '*' }).where('dt', '>=', todayTimestamp);
+            const row2 = await db(LogEntryModel.tableName).count({ count: '*' }).where('dt', '>=', weekTimestamp);
+            const row3 = await db(LogEntryModel.tableName).count({ count: '*' }).where('dt', '>=', monthTimestamp);
+
+            const searchesToday = +(row1[0]?.count ?? NaN);
+            const searchesWeek = +(row2[0]?.count ?? NaN);
+            const searchesMonth = +(row3[0]?.count ?? NaN);
+
+            result.observe(searchesToday, { period: 'today' });
+            result.observe(searchesWeek, { period: 'week' });
+            result.observe(searchesMonth, { period: 'month' });
         });
 }
 
