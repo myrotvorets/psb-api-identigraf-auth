@@ -32,8 +32,8 @@ export function initAsyncMetrics({ db, meter }: Container): void {
         })
         .addCallback(async (result) => {
             const today = new Date();
-            const week = today;
-            const month = today;
+            const week = new Date();
+            const month = new Date();
 
             week.setDate(today.getDate() - 7);
             month.setDate(today.getDate() - 30);
@@ -78,11 +78,13 @@ export function initAsyncMetrics({ db, meter }: Container): void {
         })
         .addCallback(async (result) => {
             const today = new Date();
-            today.setUTCHours(0, 0, 0, 0);
-            const week = today;
-            const month = today;
+            const week = new Date();
+            const month = new Date();
 
+            today.setUTCHours(0, 0, 0, 0);
+            week.setUTCHours(0, 0, 0, 0);
             week.setDate(today.getDate() - 7);
+            month.setUTCHours(0, 0, 0, 0);
             month.setDate(today.getDate() - 30);
 
             const todayTimestamp = today.getTime() / 1000;
