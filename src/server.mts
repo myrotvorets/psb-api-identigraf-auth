@@ -61,10 +61,7 @@ export async function run(): Promise<void> {
     server.listen(env.PORT);
 
     process.on('beforeExit', () => {
-        container
-            .resolve('db')
-            .destroy()
-            .catch((e) => console.error(e));
+        container.dispose().catch((e) => console.error(e));
     });
 }
 /* c8 ignore stop */

@@ -1,4 +1,4 @@
-import { Knex } from 'knex';
+import type { Knex } from 'knex';
 import { UserModel } from '../models/user.mjs';
 import { LogEntryModel } from '../models/logentry.mjs';
 
