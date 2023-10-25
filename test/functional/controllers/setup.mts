@@ -10,7 +10,7 @@ export async function setUpSuite(): Promise<unknown> {
     mockDate();
 
     app = createApp();
-    await configureApp(app);
+    configureApp(app);
 
     return container.resolve('db').migrate.latest();
 }
