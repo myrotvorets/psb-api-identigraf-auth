@@ -13,6 +13,7 @@ import { loggerMiddleware } from './middleware/logger.mjs';
 import { authController } from './controllers/auth.mjs';
 import { monitoringController } from './controllers/monitoring.mjs';
 import { trackController } from './controllers/track.mjs';
+import { userController } from './controllers/user.mjs';
 
 export function configureApp(app: Express): ReturnType<typeof initializeContainer> {
     return getTracer().startActiveSpan('configureApp', (span): ReturnType<typeof initializeContainer> => {
@@ -26,9 +27,10 @@ export function configureApp(app: Express): ReturnType<typeof initializeContaine
             app.use('/monitoring', monitoringController(db));
 
             app.use(
-                installOpenApiValidator(join(base, 'specs', 'identigraf-auth-internal.yaml'), env.NODE_ENV),
+                installOpenApiValidator(join(base, 'specs', 'identigraf-auth-private.yaml'), env.NODE_ENV),
                 authController(),
                 trackController(),
+                userController(),
                 notFoundMiddleware,
                 errorMiddleware,
             );
@@ -53,15 +55,12 @@ export function createApp(): Express {
     return app;
 }
 
+/* c8 ignore start */
 export async function run(): Promise<void> {
     const app = createApp();
     const container = configureApp(app);
-    const env = container.resolve('environment');
-
     const server = await createServer(app);
-    server.listen(env.PORT);
-
-    process.on('beforeExit', () => {
+    server.on('close', () => {
         container.dispose().catch((e) => console.error(e));
     });
 }

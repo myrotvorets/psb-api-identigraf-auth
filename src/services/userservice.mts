@@ -1,5 +1,5 @@
 import type { User, UserModel } from '../models/user.mjs';
-import type { ModelService, UserServiceInterface } from './index.mjs';
+import type { ModelService, SearchParams, UserServiceInterface } from './index.mjs';
 
 interface UserServiceOptions {
     modelService: ModelService;
@@ -18,5 +18,13 @@ export class UserService implements UserServiceInterface {
 
     public saveUser(user: Partial<User>): Promise<User | undefined> {
         return this.userModel.save(user);
+    }
+
+    public search(params: SearchParams): Promise<[User[], number]> {
+        return this.userModel.search(params);
+    }
+
+    public getUserById(id: number): Promise<User | undefined> {
+        return this.userModel.getById(id);
     }
 }

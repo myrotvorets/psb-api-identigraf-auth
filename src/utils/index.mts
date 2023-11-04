@@ -10,3 +10,7 @@ export function tomorrow(): number {
     tomorrow.setDate(tomorrow.getDate() + 1);
     return Math.floor(tomorrow.getTime() / 1000);
 }
+
+export function escapeLike(s: string): string {
+    return s.replace(/([_%])/gu, '\\$1');
+}
