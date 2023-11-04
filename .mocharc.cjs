@@ -1,7 +1,7 @@
 /** @type {import('mocha').MochaOptions} */
 module.exports = {
     recursive: true,
-    extension: ['.test.mts'],
+    extension: process.env.JS_TESTS ? ['.test.mjs'] : ['.test.mts'],
     require: 'mocha.setup.mjs',
     reporter: 'mocha-multi',
     'reporter-option': [

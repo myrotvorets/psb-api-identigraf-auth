@@ -36,11 +36,11 @@ export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env):
         migrations: {
             tableName: 'knex_migrations_identigraf_auth',
             directory: join(base, '..', 'test', 'migrations'),
-            loadExtensions: ['.mts'],
+            loadExtensions: ['.mts', '.mjs'],
         },
         seeds: {
             directory: join(base, '..', 'test', 'seeds'),
-            loadExtensions: ['.mts'],
+            loadExtensions: ['.mts', '.mjs'],
         },
     };
 

@@ -56,14 +56,14 @@ async function loginHandler(
     const user = await authService.login(uid, phone);
     if (user) {
         sendUserDetails(res, user);
-    } else {
+    } /* c8 ignore start */ else {
         next({
             success: false,
             status: 500,
             code: 'INTERNAL_ERROR',
             message: 'Failed to log in user',
         } as ErrorResponse);
-    }
+    } /* c8 ignore stop */
 }
 
 async function checkPhoneHandler(

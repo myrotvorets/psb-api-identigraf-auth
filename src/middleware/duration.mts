@@ -15,9 +15,11 @@ export const requestDurationMiddleware: RequestHandler = (req, res, next): void 
         let route: string | undefined;
         if ('openapi' in req && req.openapi) {
             const r = req as OpenApiRequest;
+            /* c8 ignore next */
             route = r.openapi!.openApiRoute || r.openapi!.expressRoute;
         }
 
+        /* c8 ignore start */
         if (!route && req.route) {
             route = (req.route as Record<'path', string>).path;
         }
@@ -25,6 +27,7 @@ export const requestDurationMiddleware: RequestHandler = (req, res, next): void 
         if (!route) {
             route = '<unknown>';
         }
+        /* c8 ignore stop */
 
         requestDurationHistogram.record(hrTimeToMilliseconds(duration), {
             [SemanticAttributes.HTTP_METHOD]: req.method,

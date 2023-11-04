@@ -161,7 +161,7 @@ describe('UserController', function () {
                 return request(app)
                     .patch('/users/3')
                     .set('Content-Type', 'application/json')
-                    .send({ credits: 10 })
+                    .send({ credits: 10, admin: true })
                     .expect(200)
                     .expect({
                         success: true,
@@ -169,7 +169,7 @@ describe('UserController', function () {
                             id: 3,
                             uid: 'uid3',
                             login: '+380000000003',
-                            admin: 0,
+                            admin: 1,
                             whitelisted: 0,
                             credits: 10,
                             lastseen: 20000101,

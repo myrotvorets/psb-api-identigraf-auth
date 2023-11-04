@@ -14,20 +14,14 @@ export interface Models {
 export class ModelService {
     private readonly _db: Knex;
     private readonly _user: UserModel;
-    private readonly _logEntry: LogEntryModel;
 
     public constructor({ db }: ModelServiceOptions) {
         this._db = db;
         this._user = new UserModel({ db });
-        this._logEntry = new LogEntryModel({ db });
     }
 
     public get user(): UserModel {
         return this._user;
-    }
-
-    public get logEntry(): LogEntryModel {
-        return this._logEntry;
     }
 
     public transaction<T = unknown>(

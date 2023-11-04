@@ -74,8 +74,8 @@ export class UserModel {
             countQuery = countQuery.where('comment', 'like', `%${v}%`);
         }
 
-        const total = (await countQuery.count({ count: 'id' }).first()) ?? {};
-        const cnt = Number(total.count);
+        const total = await countQuery.count({ count: 'id' }).first();
+        const cnt = Number(total?.count);
 
         if (cnt && offset < cnt) {
             if (order && dir) {
