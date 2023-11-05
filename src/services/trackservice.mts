@@ -24,7 +24,7 @@ export class TrackService implements TrackServiceInterface {
         ips: string[],
         guid: string,
         dt: number,
-    ): Promise<[number, boolean]> {
+    ): Promise<[credits: number, whitelisted: boolean]> {
         let credits = -Infinity;
         let wl = false;
 

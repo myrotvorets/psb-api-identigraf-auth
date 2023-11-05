@@ -14,6 +14,30 @@ export class VerboseTrackService extends TrackService {
         this.#logger = options.logger;
     }
 
+    public override async trackUpload(
+        what: string,
+        login: string,
+        ips: string[],
+        guid: string,
+        dt: number,
+    ): Promise<[number, boolean]> {
+        this.#logger.debug(
+            `Tracking upload: what=${what}, login=${login}, ips=${ips.join(', ')}, guid=${guid}, dt=${dt}`,
+        );
+
+        try {
+            const [credis, whitelisted] = await super.trackUpload(what, login, ips, guid, dt);
+            this.#logger.debug(
+                `Tracked upload for login=${login}, guid=${guid}; credits=${credis}, whitelisted=${whitelisted}`,
+            );
+
+            return [credis, whitelisted];
+        } catch (err) {
+            this.#logger.error(`Failed to track upload: ${err}`);
+            throw err;
+        }
+    }
+
     protected override adjustCredits(user: User): [data: Partial<User>, credits: number, whitelisted: boolean] {
         this.#logger.debug(
             `Adjusting credits for user "${user.login}": whitelisted=${user.whitelisted}, credits=${user.credits}, lastseen=${user.lastseen}`,
