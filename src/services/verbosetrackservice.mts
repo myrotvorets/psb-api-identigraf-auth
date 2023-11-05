@@ -34,11 +34,11 @@ export class VerboseTrackService extends TrackService {
 
             uploadTrackCounter.add(1, { type: what, status: 'success' });
             return [credis, whitelisted];
-        } catch (err) {
+        } /* c8 ignore start */ catch (err) {
             this.#logger.error(`Failed to track upload: ${err}`);
             uploadTrackCounter.add(1, { type: what, status: 'failure' });
             throw err;
-        }
+        } /* c8 ignore stop */
     }
 
     protected override adjustCredits(user: User): [data: Partial<User>, credits: number, whitelisted: boolean] {
