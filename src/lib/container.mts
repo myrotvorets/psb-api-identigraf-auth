@@ -1,7 +1,7 @@
 import { AwilixContainer, asClass, asFunction, asValue, createContainer } from 'awilix';
 import type { NextFunction, Request, Response } from 'express';
 import * as knexpkg from 'knex';
-import { type Logger, type Meter, getLogger, getMeter } from '@myrotvorets/otel-utils';
+import { type Logger, type Meter, type Tracer, getLogger, getMeter, getTracer } from '@myrotvorets/otel-utils';
 import { environment } from './environment.mjs';
 import { buildKnexConfig } from '../knexfile.mjs';
 import type { AuthServiceInterface, TrackServiceInterface, UserServiceInterface } from '../services/index.mjs';
@@ -14,6 +14,7 @@ export interface Container {
     environment: ReturnType<typeof environment>;
     logger: Logger;
     meter: Meter;
+    tracer: Tracer;
     defaultCredits: number;
     db: knexpkg.Knex;
     authService: AuthServiceInterface;
@@ -50,6 +51,10 @@ function createMeter(): Meter {
     return getMeter();
 }
 
+function createTracer(): Tracer {
+    return getTracer();
+}
+
 function createDatabase(): knexpkg.Knex {
     const { knex } = knexpkg.default;
     return knex(buildKnexConfig());
@@ -61,6 +66,7 @@ export function initializeContainer(): typeof container {
         environment: asValue(env),
         logger: asFunction(createLogger).scoped(),
         meter: asFunction(createMeter).singleton(),
+        tracer: asFunction(createTracer).singleton(),
         defaultCredits: asValue(env.DEFAULT_CREDITS),
         db: asFunction(createDatabase)
             .singleton()
