@@ -4,7 +4,7 @@ import type { ModelService } from './modelservice.mjs';
 import type { TrackServiceInterface } from './trackserviceinterface.mjs';
 import { today } from '../utils/index.mjs';
 
-interface TrackServiceOptions {
+export interface TrackServiceOptions {
     modelService: ModelService;
     defaultCredits: number;
 }
@@ -46,7 +46,7 @@ export class TrackService implements TrackServiceInterface {
         });
     }
 
-    private adjustCredits(user: User): [data: Partial<User>, credits: number, whitelisted: boolean] {
+    protected adjustCredits(user: User): [data: Partial<User>, credits: number, whitelisted: boolean] {
         let credits;
         let wl = false;
         const thisDay = today();
@@ -71,7 +71,7 @@ export class TrackService implements TrackServiceInterface {
         return [data, credits, wl];
     }
 
-    private async trackSearch(
+    protected async trackSearch(
         logEntryModel: LogEntryModel,
         login: string,
         guid: string,

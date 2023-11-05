@@ -7,8 +7,8 @@ import { buildKnexConfig } from '../knexfile.mjs';
 import type { AuthServiceInterface, TrackServiceInterface, UserServiceInterface } from '../services/index.mjs';
 import { AuthService } from '../services/authservice.mjs';
 import { ModelService } from '../services/modelservice.mjs';
-import { TrackService } from '../services/trackservice.mjs';
 import { UserService } from '../services/userservice.mjs';
+import { VerboseTrackService } from '../services/verbosetrackservice.mjs';
 
 export interface Container {
     environment: ReturnType<typeof environment>;
@@ -66,7 +66,7 @@ export function initializeContainer(): typeof container {
             .singleton()
             .disposer((db) => db.destroy()),
         authService: asClass(AuthService).singleton(),
-        trackService: asClass(TrackService).singleton(),
+        trackService: asClass(VerboseTrackService).singleton(),
         userService: asClass(UserService).singleton(),
         modelService: asClass(ModelService).singleton(),
     });
