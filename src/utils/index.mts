@@ -12,5 +12,5 @@ export function tomorrow(): number {
 }
 
 export function escapeLike(s: string): string {
-    return s.replace(/([_%])/gu, '\\$1');
+    return s.replace(/([_%\\])/gu, '\\$1');
 }

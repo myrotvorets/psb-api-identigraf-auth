@@ -22,8 +22,8 @@ describe('Utils', function () {
 
     describe('escapeLike', function () {
         it('should escape strings for LIKE condition', function () {
-            const input = '10_000%';
-            const expected = '10\\_000\\%';
+            const input = '10\\_000%';
+            const expected = '10\\\\\\_000\\%';
             expect(escapeLike(input)).to.equal(expected);
         });
     });
