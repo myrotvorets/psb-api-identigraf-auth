@@ -1,6 +1,7 @@
 import type { Logger } from '@myrotvorets/otel-utils';
 import { TrackService, type TrackServiceOptions } from './trackservice.mjs';
 import type { User } from '../models/user.mjs';
+import { uploadTrackCounter } from '../lib/metrics.mjs';
 
 interface VerboseTrackServiceOptions extends TrackServiceOptions {
     logger: Logger;
@@ -31,9 +32,11 @@ export class VerboseTrackService extends TrackService {
                 `Tracked upload for login=${login}, guid=${guid}; credits=${credis}, whitelisted=${whitelisted}`,
             );
 
+            uploadTrackCounter.add(1, { type: what, status: 'success' });
             return [credis, whitelisted];
         } catch (err) {
             this.#logger.error(`Failed to track upload: ${err}`);
+            uploadTrackCounter.add(1, { type: what, status: 'failure' });
             throw err;
         }
     }

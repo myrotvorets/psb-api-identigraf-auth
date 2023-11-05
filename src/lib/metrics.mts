@@ -12,6 +12,12 @@ export const requestDurationHistogram = meter.createHistogram('psbapi.request.du
     valueType: ValueType.DOUBLE,
 });
 
+export const uploadTrackCounter = meter.createCounter('psbapi.identigraf.upload.track', {
+    description: 'Number of uploads tracked.',
+    unit: '{count}',
+    valueType: ValueType.INT,
+});
+
 export function initAsyncMetrics({ db, meter }: Container): void {
     meter
         .createObservableUpDownCounter('identigraf.users', {
