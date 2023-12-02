@@ -72,6 +72,16 @@ async function checkPhoneHandler(
     next: NextFunction,
 ): Promise<void> {
     const { phone } = req.body;
+    if (/\.(by|ru)/iu.test(phone)) {
+        next({
+            success: false,
+            status: 403,
+            code: 'FORBIDDEN',
+            message: 'Access denied',
+        } as ErrorResponse);
+        return;
+    }
+
     const userService = res.locals.container.resolve('userService');
     const user = await userService.getUserByLogin(phone);
 
