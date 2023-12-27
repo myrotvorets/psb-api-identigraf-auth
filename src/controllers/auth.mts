@@ -130,7 +130,7 @@ async function getCreditsHandler(
         phone = `+${phone}`;
     }
 
-    const credits = await authService.getRemainingCredits(`${phone}`);
+    const credits = await authService.getRemainingCredits(phone);
     res.send({
         success: true,
         credits,
