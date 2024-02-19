@@ -4,7 +4,9 @@ import { environment } from '../../../src/lib/environment.mjs';
 
 describe('AuthController', function () {
     before(setUpSuite);
+
     after(tearDownSuite);
+
     beforeEach(setUp);
 
     describe('checkPhoneHandler', function () {

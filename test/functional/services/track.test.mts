@@ -18,7 +18,9 @@ const getLogs = (): Promise<Pick<LogEntry, 'login' | 'ip'>[]> =>
 
 describe('TrackService', function () {
     before(setUpSuite);
+
     after(tearDownSuite);
+
     beforeEach(setUp);
 
     it('should not log anything if user does not exists', async function () {
