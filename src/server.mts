@@ -32,7 +32,7 @@ export function configureApp(app: Express): ReturnType<typeof initializeContaine
                 trackController(),
                 userController(),
                 notFoundMiddleware,
-                errorMiddleware,
+                errorMiddleware(),
             );
 
             initAsyncMetrics(container.cradle);

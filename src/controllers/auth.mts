@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response, Router } from 'express';
 import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
-import type { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
+import { ApiError } from '@myrotvorets/express-microservice-middlewares';
 import { today, tomorrow } from '../utils/index.mjs';
 import type { User } from '../models/user.mjs';
 import type { LocalsWithContainer } from '../lib/container.mjs';
@@ -57,12 +57,7 @@ async function loginHandler(
     if (user) {
         sendUserDetails(res, user);
     } /* c8 ignore start */ else {
-        next({
-            success: false,
-            status: 500,
-            code: 'INTERNAL_ERROR',
-            message: 'Failed to log in user',
-        } as ErrorResponse);
+        next(new ApiError(500, 'INTERNAL_ERROR', 'Failed to log user in'));
     } /* c8 ignore stop */
 }
 
@@ -73,12 +68,7 @@ async function checkPhoneHandler(
 ): Promise<void> {
     const { phone } = req.body;
     if (/\.(by|ru)/iu.test(phone)) {
-        next({
-            success: false,
-            status: 403,
-            code: 'FORBIDDEN',
-            message: 'Access denied',
-        } as ErrorResponse);
+        next(new ApiError(403, 'FORBIDDEN', 'Access denied'));
         return;
     }
 
@@ -87,17 +77,14 @@ async function checkPhoneHandler(
 
     if (user) {
         if (!user.whitelisted && user.lastseen === today() && user.credits <= 0) {
-            next({
-                success: false,
-                status: 419,
-                code: 'OUT_OF_CREDITS',
-                message: 'You have run out of credits',
-                additionalHeaders: {
-                    'X-RateLimit-Limit': `${res.locals.container.resolve('defaultCredits')}`,
-                    'X-RateLimit-Remaining': '0',
-                    'X-RateLimit-Reset': `${tomorrow()}`,
-                },
-            } as ErrorResponse);
+            const error = new ApiError(419, 'OUT_OF_CREDITS', 'You have run out of credits');
+            error.additionalHeaders = {
+                'X-RateLimit-Limit': `${res.locals.container.resolve('defaultCredits')}`,
+                'X-RateLimit-Remaining': '0',
+                'X-RateLimit-Reset': `${tomorrow()}`,
+            };
+
+            next(error);
         } else {
             sendUserDetails(res, user);
         }
