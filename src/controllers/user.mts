@@ -1,18 +1,11 @@
 import { type NextFunction, type Request, type Response, Router } from 'express';
-import { type ErrorResponse, numberParamHandler } from '@myrotvorets/express-microservice-middlewares';
+import { ApiError, numberParamHandler } from '@myrotvorets/express-microservice-middlewares';
 import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
 import type { User } from '../models/user.mjs';
 import type { LocalsWithContainer } from '../lib/container.mjs';
 import { SearchParams } from '../services/userserviceinterface.mjs';
 
-function userNotFound(id: number): ErrorResponse {
-    return {
-        success: false,
-        status: 404,
-        code: 'USER_NOT_FOUND',
-        message: `User ${id} not found`,
-    };
-}
+const userNotFound = (id: number): ApiError => new ApiError(404, 'USER_NOT_FOUND', `User ${id} not found`);
 
 interface UserIdParams {
     id: number;
@@ -85,12 +78,7 @@ async function patchUser(
             next(userNotFound(req.params.id));
         }
     } else {
-        next({
-            success: false,
-            status: 400,
-            code: 'BAD_PATCH',
-            message: 'Need at least one property to update',
-        } as ErrorResponse);
+        next(new ApiError(400, 'BAD_PATCH', 'Need at least one property to update'));
     }
 }
 
