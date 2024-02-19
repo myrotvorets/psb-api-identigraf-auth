@@ -4,7 +4,9 @@ import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 describe('UserController', function () {
     before(setUpSuite);
+
     after(tearDownSuite);
+
     beforeEach(setUp);
 
     describe('getUserById', function () {

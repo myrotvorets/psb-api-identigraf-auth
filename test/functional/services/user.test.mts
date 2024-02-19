@@ -12,6 +12,7 @@ describe('AuthService', function () {
     });
 
     after(tearDownSuite);
+
     beforeEach(setUp);
 
     describe('#getUserByLogin', function () {

@@ -4,6 +4,7 @@ import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
 
 describe('Utils', function () {
     before(mockDate);
+
     after(unmockDate);
 
     describe('today', function () {

@@ -3,7 +3,9 @@ import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 describe('TrackController', function () {
     before(setUpSuite);
+
     after(tearDownSuite);
+
     beforeEach(setUp);
 
     describe('trackHandler', function () {
