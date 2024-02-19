@@ -42,7 +42,7 @@
     "mysql2": "^3.9.1"
   },
   "devDependencies": {
-    "@myrotvorets/eslint-config-myrotvorets-ts": "^2.24.0",
+    "@myrotvorets/eslint-config-myrotvorets-ts": "^2.25.0",
     "@types/chai": "^4.3.11",
     "@types/chai-as-promised": "^7.1.8",
     "@types/express": "^4.17.21",
