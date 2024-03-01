@@ -83,7 +83,7 @@ export class TrackService implements TrackServiceInterface {
             await logEntryModel.insert({
                 login,
                 guid: Buffer.from(guid.replace(/[^0-9a-fA-F]/gu, ''), 'hex'),
-                ip: inet_pton(ip),
+                ip: inet_pton(ip) ?? '0.0.0.0',
                 dt,
                 misc: '',
             });
