@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-hardcoded-ip */
 import { expect } from 'chai';
 import { inet_pton } from 'inet_xtoy';
 import { container } from '../../../src/lib/container.mjs';
