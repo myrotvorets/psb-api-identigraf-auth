@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/assertions-in-tests, sonarjs/no-nested-functions */
 import request from 'supertest';
 import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 import { environment } from '../../../src/lib/environment.mjs';
