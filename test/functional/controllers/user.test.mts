@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/assertions-in-tests, sonarjs/no-nested-functions, sonarjs/no-hardcoded-ip */
+/* eslint-disable sonarjs/assertions-in-tests, sonarjs/no-nested-functions */
 import request from 'supertest';
 import { expect } from 'chai';
 import { app, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
