@@ -1,16 +1,17 @@
-import { type Express } from 'express';
+import type { RequestListener } from 'node:http';
 import { configureApp, createApp } from '../../../src/server.mjs';
 import { container } from '../../../src/lib/container.mjs';
 import { mockDate, unmockDate } from '../../helpers/dateproxy.mjs';
 
-export let app: Express;
+export let app: RequestListener;
 
 export async function setUpSuite(): Promise<unknown> {
     await container.dispose();
     mockDate();
 
-    app = createApp();
-    configureApp(app);
+    const application = createApp();
+    configureApp(application);
+    app = application as RequestListener;
 
     return container.resolve('db').migrate.latest();
 }

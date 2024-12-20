@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/assertions-in-tests */
 /* eslint-disable import/no-named-as-default-member */
+import type { RequestListener } from 'node:http';
 import { expect } from 'chai';
 import express, { type Express } from 'express';
 import request from 'supertest';
@@ -38,11 +39,17 @@ describe('MonitoringController', function () {
     });
 
     const checker200 = (endpoint: string): Promise<unknown> =>
-        request(app).get(`/monitoring/${endpoint}`).expect('Content-Type', /json/u).expect(200);
+        request(app as RequestListener)
+            .get(`/monitoring/${endpoint}`)
+            .expect('Content-Type', /json/u)
+            .expect(200);
 
     const checker503 = (endpoint: string): Promise<unknown> => {
         healthChecker!.shutdownRequested = true;
-        return request(app).get(`/monitoring/${endpoint}`).expect('Content-Type', /json/u).expect(503);
+        return request(app as RequestListener)
+            .get(`/monitoring/${endpoint}`)
+            .expect('Content-Type', /json/u)
+            .expect(503);
     };
 
     describe('Liveness Check', function () {

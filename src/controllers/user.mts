@@ -86,7 +86,7 @@ function updateUser(
     req: Request<UserIdParams, UserResponse, UserSaveRequestBody, never>,
     res: Response<UserResponse, LocalsWithContainer>,
     next: NextFunction,
-): Promise<unknown> {
+): Promise<void> {
     return patchUser(req, res, next);
 }
 
