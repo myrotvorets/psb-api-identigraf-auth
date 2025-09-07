@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { inet_pton } from 'inet_xtoy';
 import { container } from '../../../src/lib/container.mjs';
-import { LogEntry, LogEntryModel, User, UserModel } from '../../../src/models/index.mjs';
+import { type LogEntry, LogEntryModel, type User, UserModel } from '../../../src/models/index.mjs';
 import { db, setUp, setUpSuite, tearDownSuite } from './setup.mjs';
 
 interface CountResult {
